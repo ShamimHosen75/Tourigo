@@ -19,8 +19,8 @@ export function Logo({ size = 'md' }: { size?: 'md' | 'lg' }) {
       )}
       <span className="leading-none">
         <span className={`block font-script ${size === 'lg' ? 'text-3xl' : 'text-[1.6rem]'} font-bold`}>
-          <span className="text-brand-500">{siteConfig.name.split(' ')[0]}</span>{' '}
-          <span className="text-accent-500">{siteConfig.name.split(' ').slice(1).join(' ')}</span>
+          <span className="text-brand-500">{siteConfig.logoText[0]}</span>
+          <span className="text-accent-500">{siteConfig.logoText[1]}</span>
         </span>
         <span className="mt-0.5 block text-[11px] font-medium text-ink-mute">{siteConfig.tagline}</span>
       </span>

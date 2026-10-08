@@ -1,7 +1,9 @@
 // Brand settings live here. Replace the name, tagline, logo and contact details
 // once the final branding is ready; every page reads from this file.
 export const siteConfig = {
-  name: 'Ghuri Trails',
+  name: 'Tourigo',
+  // The logo wordmark prints these two parts in blue and amber.
+  logoText: ['Touri', 'go'],
   tagline: 'Never stop exploring',
   description:
     'Discover and book the best treks, tours and travel packages across Bangladesh — Sajek, Bandarban, Saint Martin, Sundarbans, Sylhet and more.',
