@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --header-h: 104px; /* ticker + navbar */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper text-ink antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @apply font-display;
+}
+
+@layer components {
+  .section-title {
+    @apply font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl md:text-[2.75rem];
+  }
+  .section-title .accent {
+    @apply block text-brand-500;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 transition hover:-translate-y-0.5 hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-200 disabled:pointer-events-none disabled:opacity-60;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-soft transition hover:border-brand-300 hover:text-brand-600;
+  }
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:bg-white focus:ring-4 focus:ring-brand-100;
+  }
+  .card {
+    @apply rounded-2xl border border-slate-100 bg-white shadow-sm;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+  }
+}
+
+/* 3D flip cards */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* edge fade for marquees */
+.fade-x {
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+
+.pause-on-hover:hover .animate-marquee,
+.pause-on-hover:hover .animate-marquee-rev {
+  animation-play-state: paused;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* hero mist drift */
+@keyframes mist-drift {
+  from {
+    transform: translateX(-60px);
+  }
+  to {
+    transform: translateX(60px);
+  }
+}
+.hero-mist-a {
+  animation: mist-drift 18s ease-in-out infinite alternate;
+}
+.hero-mist-b {
+  animation: mist-drift 13s ease-in-out infinite alternate-reverse;
+}
