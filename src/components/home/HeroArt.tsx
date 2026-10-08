@@ -1,3 +1,5 @@
+import { HeroTrekker } from './HeroTrekker';
+
 // Illustrated hero: layered mountains, drifting mist and a trekker seen from behind.
 // Used until real hero photos are set in siteConfig.heroImages.
 
@@ -43,34 +45,6 @@ const palettes: Record<WeatherMode, { sky: [string, string, string]; far: [strin
   snow: { sky: ['#0f5fc4', '#3f8fe0', '#cfe8ff'], far: ['#ffffff', '#6f8ca8'], mid: '#5b8a52', mid2: '#3f7340', near: '#2a5230', rock: '#2a2a2a', mist: 0.55, snowLine: 0.55 },
 };
 
-function Hiker() {
-  // Back view silhouette: cap, shoulders, tall pack with bedroll, trekking pole.
-  return (
-    <g transform="translate(800 792) scale(0.82)" fill="#16120f">
-      <ellipse cx="0" cy="2" rx="110" ry="12" fill="#000" opacity=".35" />
-      {/* legs + boots */}
-      <path d="M-30,-200 C-34,-140 -36,-70 -38,-8 L-12,-8 C-10,-70 -6,-130 -2,-170 L2,-170 C6,-130 10,-70 12,-8 L38,-8 C36,-70 34,-140 30,-200 Z" fill="#1f1a16" />
-      <path d="M-42,-12 L-8,-12 L-6,2 L-46,2 Z M8,-12 L42,-12 L46,2 L6,2 Z" />
-      {/* torso */}
-      <path d="M-52,-330 C-30,-346 30,-346 52,-330 L46,-196 L-46,-196 Z" fill="#221c17" />
-      {/* arms */}
-      <path d="M-52,-326 C-62,-290 -66,-250 -66,-214 L-54,-212 C-52,-246 -46,-284 -40,-310 Z" />
-      <path d="M52,-326 C64,-292 74,-262 80,-236 L69,-230 C60,-256 50,-284 42,-306 Z" />
-      <path d="M76,-240 L92,0" stroke="#3b2f25" strokeWidth="4.5" strokeLinecap="round" />
-      {/* backpack */}
-      <path d="M-44,-334 C-44,-352 44,-352 44,-334 L46,-214 C46,-200 -46,-200 -46,-214 Z" fill="#2c241d" />
-      <rect x="-34" y="-300" width="68" height="46" rx="12" fill="#231d17" />
-      <rect x="-48" y="-224" width="96" height="12" rx="6" fill="#1a1612" />
-      <rect x="-50" y="-372" width="100" height="26" rx="13" fill="#3a2f25" />
-      <path d="M-24,-372 v26 M2,-372 v26 M28,-372 v26" stroke="#2a221b" strokeWidth="3" />
-      {/* neck, head, cap */}
-      <rect x="-9" y="-384" width="18" height="14" />
-      <ellipse cx="0" cy="-400" rx="17" ry="19" />
-      <path d="M-20,-406 C-18,-428 18,-428 20,-406 L24,-402 L-24,-402 Z" fill="#0f0c0a" />
-    </g>
-  );
-}
-
 export function HeroArt({ mode }: { mode: WeatherMode }) {
   const p = palettes[mode];
   const id = `h-${mode}`;
@@ -115,8 +89,9 @@ export function HeroArt({ mode }: { mode: WeatherMode }) {
       </g>
       <path d={mountain(42, 730, 220, 0.5)} fill={p.near} />
       {/* rock the trekker stands on */}
-      <path d="M560,900 L600,800 Q700,760 800,770 Q930,760 1010,810 L1050,900 Z" fill={p.rock} />
-      <Hiker />
+      <path d="M540,900 L590,805 Q690,778 800,784 Q930,776 1020,812 L1070,900 Z" fill={p.rock} />
+      <path d="M600,806 Q700,786 800,790 Q920,784 1010,814" stroke="#000" strokeOpacity=".25" strokeWidth="3" fill="none" />
+      <HeroTrekker x={800} y={800} scale={1.16} />
       <rect width={VW} height={VH} fill={`url(#${id}-vig)`} />
     </svg>
   );
