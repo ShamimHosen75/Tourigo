@@ -3,20 +3,31 @@ import { ChevronRight, Mail, MapPin, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from '@/components/ui/SocialIcons';
 import { Logo } from './Logo';
+import { HeroTrekker } from '@/components/home/HeroTrekker';
+
+// Trekker height in px that appears above the footer border line.
+const TREKKER_H = 130;
+// The HeroTrekker SVG viewBox is 230×480; scale to fill TREKKER_H pixels.
+const TREKKER_SCALE = TREKKER_H / 480;
+const TREKKER_W = Math.round(230 * TREKKER_SCALE);
 
 function WalkingHiker() {
-  // Little trekker that walks along the footer's top line forever.
+  // Large detailed trekker (same as hero) that walks along the footer's top line.
   return (
-    <div className="pointer-events-none absolute inset-x-0 -top-[46px] h-[46px] overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none absolute inset-x-0 overflow-hidden"
+      style={{ top: -TREKKER_H, height: TREKKER_H }}
+      aria-hidden
+    >
       <div className="absolute bottom-0 animate-walk">
-        <svg viewBox="0 0 40 46" className="h-[46px] w-10 animate-bob">
-          <circle cx="21" cy="6" r="4.5" fill="#7c4a1e" />
-          <path d="M17 1.5 q4 -2.5 8 0 l-.5 2 h-7z" fill="#15803d" />
-          <rect x="10" y="12" width="9" height="15" rx="3" fill="#f59e0b" />
-          <path d="M17 11 h8 l1.5 15 h-10z" fill="#16a34a" />
-          <path d="M18 26 l-4 18 h3 l4 -12 l3 12 h3 l-3 -18z" fill="#334155" />
-          <path d="M25 13 l6 9 l-2 1.5 l-5 -6z" fill="#7c4a1e" />
-          <path d="M31 14 l2 30" stroke="#57534e" strokeWidth="1.6" />
+        <svg
+          viewBox={`0 0 ${TREKKER_W} ${TREKKER_H}`}
+          width={TREKKER_W}
+          height={TREKKER_H}
+          className="animate-bob"
+          overflow="visible"
+        >
+          <HeroTrekker x={TREKKER_W / 2} y={TREKKER_H} scale={TREKKER_SCALE} />
         </svg>
       </div>
     </div>

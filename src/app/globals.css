@@ -86,18 +86,32 @@ h4 {
   }
 }
 
-/* hero mist drift */
+/* hero atmosphere animations */
 @keyframes mist-drift {
-  from {
-    transform: translateX(-60px);
-  }
-  to {
-    transform: translateX(60px);
-  }
+  from { transform: translateX(-60px); }
+  to   { transform: translateX(60px); }
 }
-.hero-mist-a {
-  animation: mist-drift 18s ease-in-out infinite alternate;
+@keyframes cloud-drift-a {
+  from { transform: translateX(-80px); }
+  to   { transform: translateX(80px); }
 }
-.hero-mist-b {
-  animation: mist-drift 13s ease-in-out infinite alternate-reverse;
+@keyframes cloud-drift-b {
+  from { transform: translateX(50px); }
+  to   { transform: translateX(-50px); }
 }
+@keyframes cloud-drift-c {
+  from { transform: translateX(-40px) translateY(4px); }
+  to   { transform: translateX(40px)  translateY(-4px); }
+}
+@keyframes bird-glide {
+  0%   { transform: translateX(0)    translateY(0); }
+  40%  { transform: translateX(120px) translateY(-18px); }
+  70%  { transform: translateX(200px) translateY(6px); }
+  100% { transform: translateX(300px) translateY(-10px); }
+}
+.hero-mist-a   { animation: mist-drift    18s ease-in-out  infinite alternate; }
+.hero-mist-b   { animation: mist-drift    13s ease-in-out  infinite alternate-reverse; }
+.hero-clouds-a { animation: cloud-drift-a 24s ease-in-out  infinite alternate; }
+.hero-clouds-b { animation: cloud-drift-b 32s ease-in-out  infinite alternate-reverse; }
+.hero-clouds-c { animation: cloud-drift-c 20s ease-in-out  infinite alternate; }
+.hero-birds    { animation: bird-glide    60s linear        infinite; }
