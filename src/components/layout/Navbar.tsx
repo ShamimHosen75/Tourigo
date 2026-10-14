@@ -28,16 +28,47 @@ export function Navbar() {
     <nav className={`border-b bg-white/95 backdrop-blur transition-shadow ${scrolled ? 'border-slate-200 shadow-[0_6px_20px_-12px_rgba(15,23,42,.25)]' : 'border-transparent'}`}>
       <div className="mx-auto flex h-[68px] max-w-[1400px] items-center justify-between px-4 sm:px-6">
         <Logo />
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 lg:gap-2 md:flex">
           {siteConfig.nav.map((item) => (
             <li key={item.href}>
-              <Link href={item.href} className={`relative px-4 py-2 text-[15px] font-medium transition ${isActive(item.href) ? 'text-brand-500' : 'text-ink-soft hover:text-brand-500'}`}>
+              <Link
+                href={item.href}
+                className={`relative rounded-xl px-3.5 py-2 text-sm font-semibold transition-all ${
+                  isActive(item.href)
+                    ? 'text-brand-600 bg-brand-50/70'
+                    : 'text-slate-600 hover:text-brand-600 hover:bg-slate-50'
+                }`}
+              >
                 {item.label}
-                {isActive(item.href) && <motion.span layoutId="nav-underline" className="absolute inset-x-4 -bottom-0.5 h-0.5 rounded-full bg-brand-500" />}
+                {isActive(item.href) && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-xl bg-brand-50/70 -z-10"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  />
+                )}
               </Link>
             </li>
           ))}
         </ul>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <a
+            href={siteConfig.contact.phoneHref}
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-brand-600 px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <Phone className="h-3.5 w-3.5 text-brand-500 ml-1" />
+            <span>{siteConfig.contact.phone}</span>
+          </a>
+          <Link href="/packages" className="btn-primary py-2.5 px-5 text-xs shadow-md shadow-brand-500/20">
+            <span>Explore Tours</span>
+          </Link>
+        </div>
+
         <button className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 md:hidden" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>

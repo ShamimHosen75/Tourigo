@@ -1,6 +1,7 @@
 import { Hero } from '@/components/home/Hero';
 import { Categories } from '@/components/home/Categories';
 import { PopularPackages } from '@/components/home/PopularPackages';
+import { TouristMap3D } from '@/components/home/TouristMap3D';
 import { GallerySection } from '@/components/home/GallerySection';
 import { Testimonials } from '@/components/home/Testimonials';
 import { FaqSection } from '@/components/home/FaqSection';
@@ -16,6 +17,7 @@ export default async function HomePage() {
       <Hero />
       <Categories categories={categories} counts={counts} />
       <PopularPackages packages={featured.map(toCard)} destinations={gallery.length} />
+      <TouristMap3D />
       <GallerySection items={gallery} />
       <Testimonials items={testimonials} />
       <FaqSection faqs={faqs} />
