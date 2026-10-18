@@ -87,11 +87,27 @@ const spots: [string, string, GalleryItem['scene']][] = [
   ['Rangamati Hanging Bridge', 'Rangamati', 'lake'],
 ];
 
+const imageMap: Record<string, string> = {
+  'Sajek Valley': '/images/destinations/sajek.jpg',
+  "Saint Martin's Island": '/images/destinations/saint-martin.jpg',
+  "Cox's Bazar Beach": '/images/destinations/kuakata.jpg',
+  'Nafakhum Waterfall': '/images/destinations/nafakhum.jpg',
+  'Nilgiri Hills': '/images/destinations/keokradong.jpg',
+  'Sundarbans': '/images/destinations/sundarbans.jpg',
+  'Sreemangal Tea Garden': '/images/destinations/sreemangal.jpg',
+  'Ratargul Swamp Forest': '/images/destinations/ratargul.jpg',
+  'Tanguar Haor': '/images/destinations/tanguar-haor.jpg',
+  'Kaptai Lake': '/images/destinations/kaptai.jpg',
+  'Kuakata': '/images/destinations/kuakata.jpg',
+  'Tetulia (Kanchenjunga view)': '/images/destinations/manali.jpg',
+};
+
 export const galleryItems: GalleryItem[] = spots.map(([title, location, scene], i) => ({
   id: `g${i + 1}`,
   title,
   location,
   scene,
+  image: imageMap[title] ?? undefined,
 }));
 
 export const blogPosts: BlogPost[] = [

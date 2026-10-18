@@ -3,96 +3,160 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, Mountain, RefreshCw, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, Calendar, Info, Mountain, RefreshCw, TrendingUp, Users } from 'lucide-react';
 import { formatPrice } from '@/config/site';
 import type { Package } from '@/lib/types';
 import { SmartImage } from '@/components/ui/SmartImage';
 
-export type CardPackage = Pick<Package, 'slug' | 'title' | 'level' | 'durationDays' | 'durationNights' | 'price' | 'ageGroup' | 'gender' | 'altitude' | 'shortDescription' | 'scene' | 'tagline'> & { image?: string };
+export type CardPackage = Pick<
+  Package,
+  | 'slug'
+  | 'title'
+  | 'level'
+  | 'durationDays'
+  | 'durationNights'
+  | 'price'
+  | 'ageGroup'
+  | 'gender'
+  | 'altitude'
+  | 'shortDescription'
+  | 'scene'
+  | 'tagline'
+  | 'badge'
+> & { image?: string };
 
-/** Trek card that flips in 3D on hover (or with the rotate button on touch screens). */
+/**
+ * Modern travel card with realistic photography matching the clean OTA card design:
+ * - High-res top photo with floating dark pill badge
+ * - Crisp white card body with bold destination title & 2-line highlights
+ * - Bottom row with bold "From ৳..." pricing and "View Tours →" link
+ * - Optional 3D flip button to view trek altitude, duration & inclusions
+ */
 export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
   const [flipped, setFlipped] = useState(false);
   const days = `${pkg.durationDays}D / ${pkg.durationNights ?? Math.max(1, pkg.durationDays - 1)}N`;
+  const badgeText = pkg.badge || (pkg.level === 'Beginner' ? 'Most Popular' : pkg.level);
 
   return (
-    <div className="group h-[405px] [perspective:1400px]" onMouseEnter={() => setFlipped(true)} onMouseLeave={() => setFlipped(false)}>
-      <motion.div className="preserve-3d relative h-full w-full" animate={{ rotateY: flipped ? 180 : 0 }} transition={{ type: 'spring', stiffness: 120, damping: 16, mass: 0.8 }}>
-        {/* front */}
-        <div className="backface-hidden absolute inset-0 overflow-hidden rounded-3xl bg-slate-800 shadow-[0_12px_36px_-12px_rgba(15,23,42,0.25)] ring-1 ring-black/10">
-          <SmartImage src={pkg.image} scene={pkg.scene} seed={pkg.slug} alt={pkg.title} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20" />
-          
-          {/* top badges */}
-          <div className="absolute inset-x-4 top-4 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[11px] font-bold text-brand-700 shadow-md backdrop-blur-md">
-              {pkg.level}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-slate-950/70 px-3 py-1 text-[11px] font-semibold text-white/95 border border-white/15 backdrop-blur-md">
-              {days}
-            </span>
+    <div className="group h-[430px] [perspective:1400px]">
+      <motion.div
+        className="preserve-3d relative h-full w-full"
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ type: 'spring', stiffness: 120, damping: 18, mass: 0.8 }}
+      >
+        {/* FRONT FACE: Clean white card with realistic destination photography */}
+        <div className="backface-hidden absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-6px_rgba(15,23,42,0.12)] transition-all duration-300 hover:-translate-y-1">
+          {/* Top realistic photo */}
+          <div className="relative h-56 w-full overflow-hidden bg-slate-100">
+            <SmartImage
+              src={pkg.image}
+              scene={pkg.scene}
+              seed={pkg.slug}
+              alt={pkg.title}
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+
+            {/* Subtle top overlay for text readability */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/25" />
+
+            {/* Floating dark frosted pill badge (like screenshot) */}
+            <div className="absolute left-3.5 top-3.5 z-10">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-black/65 backdrop-blur-md text-white text-[11px] font-semibold tracking-wide shadow-sm border border-white/10">
+                {badgeText}
+              </span>
+            </div>
+
+            {/* Flip / Specs quick button in top-right */}
             <button
               type="button"
-              onClick={() => setFlipped((v) => !v)}
-              aria-label="Show details"
-              className="ml-auto grid h-8 w-8 place-items-center rounded-full bg-white/25 text-white backdrop-blur-md transition-all hover:bg-white/40 hover:scale-110"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setFlipped(true);
+              }}
+              title="Click to flip & view specs"
+              aria-label="View specifications"
+              className="absolute right-3.5 top-3.5 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/45 text-white/90 backdrop-blur-md transition-all hover:bg-black/75 hover:scale-110 border border-white/10"
             >
-              <RefreshCw className="h-3.5 w-3.5 transition-transform duration-500 group-hover:rotate-180" />
+              <Info className="h-3.5 w-3.5" />
             </button>
           </div>
 
-          {/* bottom content */}
-          <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-            <h3 className="text-xl font-bold leading-snug drop-shadow-sm">{pkg.title}</h3>
-            {pkg.tagline && <p className="mt-1 line-clamp-1 text-xs text-white/80">{pkg.tagline}</p>}
-            <div className="mt-4 flex items-end justify-between border-t border-white/15 pt-3">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/70">Starting From</p>
-                <p className="font-display text-2xl font-black text-white">{formatPrice(pkg.price)}</p>
+          {/* Bottom Card Content: Title, Highlights & Pricing */}
+          <div className="flex flex-1 flex-col justify-between p-5 bg-white">
+            <div>
+              <Link href={`/packages/${pkg.slug}`} className="block">
+                <h3 className="text-lg font-bold text-slate-900 group-hover:text-cyan-600 transition-colors tracking-tight line-clamp-1">
+                  {pkg.title}
+                </h3>
+              </Link>
+              <p className="mt-2 text-xs sm:text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                {pkg.tagline || pkg.shortDescription}
+              </p>
+            </div>
+
+            {/* Bottom row: "From ৳..." + "View Tours →" */}
+            <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xs sm:text-sm font-semibold text-slate-700">From</span>
+                <span className="font-bold text-slate-900 text-lg sm:text-xl font-display tracking-tight">
+                  {formatPrice(pkg.price)}
+                </span>
               </div>
-              <div className="rounded-xl border border-white/15 bg-white/10 px-3 py-1.5 text-right backdrop-blur-md">
-                <p className="text-[9px] uppercase tracking-wider text-white/70">Group Type</p>
-                <p className="text-xs font-bold text-sky-300">{pkg.ageGroup}</p>
-              </div>
+
+              <Link
+                href={`/packages/${pkg.slug}`}
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-cyan-600 hover:text-cyan-700 group-hover:gap-2 transition-all"
+              >
+                <span>View Tours</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* back */}
-        <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-3xl bg-gradient-to-b from-slate-900 via-[#0b1324] to-slate-950 p-5 text-white shadow-2xl ring-1 ring-white/15">
+        {/* BACK FACE: Detailed trek specifications & quick book */}
+        <div className="backface-hidden rotate-y-180 absolute inset-0 flex flex-col rounded-2xl bg-gradient-to-b from-slate-900 via-[#0b1324] to-slate-950 p-5 text-white shadow-2xl ring-1 ring-white/15">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <span className="inline-block rounded-full bg-brand-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-300 border border-brand-500/30">
-                Package Details
+              <span className="inline-block rounded-full bg-cyan-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-cyan-300 border border-cyan-500/30">
+                Tour Overview
               </span>
-              <h3 className="mt-1.5 text-lg font-bold leading-tight">{pkg.title}</h3>
+              <h3 className="mt-1.5 text-base font-bold leading-tight">{pkg.title}</h3>
             </div>
             <button
               type="button"
-              onClick={() => setFlipped((v) => !v)}
-              aria-label="Show photo"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+              onClick={() => setFlipped(false)}
+              aria-label="Back to card"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
             >
               <RefreshCw className="h-3.5 w-3.5" />
             </button>
           </div>
+
           <p className="mt-2.5 line-clamp-3 text-xs leading-relaxed text-slate-300">{pkg.shortDescription}</p>
-          <div className="mt-4 grid grid-cols-2 gap-2.5">
-            <Spec icon={<Calendar className="h-3.5 w-3.5" />} label="Duration" value={`${pkg.durationDays}D / ${pkg.durationNights ?? 1}N`} />
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Spec icon={<Calendar className="h-3.5 w-3.5" />} label="Duration" value={days} />
             <Spec icon={<Mountain className="h-3.5 w-3.5" />} label="Altitude" value={pkg.altitude ?? 'N/A'} />
             <Spec icon={<TrendingUp className="h-3.5 w-3.5" />} label="Difficulty" value={pkg.level} />
             <Spec icon={<Users className="h-3.5 w-3.5" />} label="Category" value={pkg.gender} highlight />
           </div>
+
           <div className="mt-auto flex items-end justify-between border-t border-white/10 pt-3">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-white/50">Starting From</p>
-              <p className="font-display text-2xl font-extrabold text-brand-400">{formatPrice(pkg.price)}</p>
+              <p className="font-display text-2xl font-extrabold text-cyan-400">{formatPrice(pkg.price)}</p>
             </div>
             <p className="text-[11px] font-medium text-white/50">Per Person</p>
           </div>
-          <Link href={`/packages/${pkg.slug}`} className="btn-primary mt-3 w-full py-3 text-xs tracking-wide uppercase font-bold">
+
+          <Link
+            href={`/packages/${pkg.slug}`}
+            className="btn-primary mt-3 w-full py-2.5 text-xs tracking-wide uppercase font-bold text-center"
+          >
             <span>Explore Tour</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-3.5 w-3.5 ml-1 inline" />
           </Link>
         </div>
       </motion.div>
@@ -102,11 +166,11 @@ export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
 
 function Spec({ icon, label, value, highlight }: { icon: React.ReactNode; label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 backdrop-blur-sm transition-colors hover:border-brand-400/40 hover:bg-white/10">
-      <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-white/60">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-2 backdrop-blur-sm transition-colors hover:border-cyan-400/40 hover:bg-white/10">
+      <p className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider text-white/60">
         {icon} {label}
       </p>
-      <p className={`mt-1 text-xs font-bold ${highlight ? 'text-brand-300' : 'text-white'}`}>{value}</p>
+      <p className={`mt-0.5 text-xs font-bold ${highlight ? 'text-cyan-300' : 'text-white'}`}>{value}</p>
     </div>
   );
 }

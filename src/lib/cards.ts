@@ -7,6 +7,7 @@ export function toCard(p: Package): CardPackage {
     slug: p.slug,
     title: p.title,
     tagline: p.tagline,
+    badge: p.badge,
     level: p.level,
     durationDays: p.durationDays,
     durationNights: p.durationNights,

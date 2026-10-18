@@ -52,6 +52,7 @@ const mapPackage = (r: Row): Package => ({
   slug: r.slug,
   title: r.title,
   tagline: r.tagline ?? undefined,
+  badge: r.badge ?? undefined,
   categorySlug: r.category_slug,
   region: r.region ?? '',
   level: r.level,

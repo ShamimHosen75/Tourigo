@@ -67,6 +67,7 @@ export interface Package {
   slug: string;
   title: string;
   tagline?: string;
+  badge?: string;
   categorySlug: string;
   region: string;
   level: Level;
