@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Backpack, Bed, Calendar, CalendarDays, Check, CheckCircle2, Clock, Compass, Flame, HelpCircle, Info, ListChecks, MapPin, Minus, Plus, ShieldCheck, Sparkles, Utensils, X } from 'lucide-react';
@@ -293,10 +294,49 @@ function Itinerary({ pkg, startDate }: { pkg: Package; startDate?: string }) {
 
 function RouteMap({ pkg }: { pkg: Package }) {
   const src = `https://maps.google.com/maps?q=${encodeURIComponent(pkg.mapQuery)}&z=10&output=embed`;
+  const destKey = pkg.slug.includes('sajek')
+    ? 'sajek'
+    : pkg.slug.includes('saint-martin')
+    ? 'saint-martin'
+    : pkg.slug.includes('sundarban')
+    ? 'sundarbans'
+    : pkg.slug.includes('sreemangal')
+    ? 'sreemangal'
+    : pkg.slug.includes('nafakhum') || pkg.slug.includes('keokradong')
+    ? 'bandarban'
+    : 'sajek';
+
   return (
     <div>
-      <H icon={<MapPin className="h-5 w-5 text-brand-500" />}>Route Map</H>
-      <p className="mt-1 text-xs text-ink-mute">{pkg.mapQuery}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <H icon={<MapPin className="h-5 w-5 text-brand-500" />}>Route Map</H>
+          <p className="mt-1 text-xs text-ink-mute">{pkg.mapQuery}</p>
+        </div>
+        <Link
+          href={`/tour-guide?to=${destKey}&from=dhaka`}
+          className="chip border border-brand-200 bg-brand-50 text-brand-600 hover:bg-brand-100 font-bold text-xs transition"
+        >
+          <Compass className="h-3.5 w-3.5" />
+          <span>A-Z Transit & Cost Guide</span>
+        </Link>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-gradient-to-r from-brand-50/80 via-white to-amber-50/60 p-4">
+        <div>
+          <p className="text-xs font-extrabold text-ink">Planning DIY Transit to this destination?</p>
+          <p className="text-[11px] text-ink-mute">
+            Check intercity bus/train options, military convoy escort times, and dynamic group budget calculator.
+          </p>
+        </div>
+        <Link
+          href={`/tour-guide?to=${destKey}&from=dhaka`}
+          className="btn-primary py-2 px-4 text-xs font-bold"
+        >
+          <span>View A-Z Guide</span>
+        </Link>
+      </div>
+
       <div className="mt-4 aspect-[16/10] overflow-hidden rounded-2xl border border-slate-100 bg-slate-100">
         <iframe title={`Map of ${pkg.title}`} src={src} className="h-full w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
       </div>

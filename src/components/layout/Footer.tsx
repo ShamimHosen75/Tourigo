@@ -37,6 +37,7 @@ function WalkingHiker() {
 export function Footer({ featured }: { featured: { title: string; slug: string }[] }) {
   const quick = [
     { label: 'Home', href: '/' },
+    { label: 'A-Z Tour Guide & Map', href: '/tour-guide' },
     { label: 'About Us', href: '/about' },
     { label: 'Packages', href: '/packages' },
     { label: 'Blogs & Articles', href: '/blogs' },

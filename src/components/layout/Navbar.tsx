@@ -40,6 +40,11 @@ export function Navbar() {
                 }`}
               >
                 {item.label}
+                {item.href === '/tour-guide' && (
+                  <span className="ml-1.5 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 px-1.5 py-0.5 text-[9px] font-black text-white shadow-xs">
+                    A-Z
+                  </span>
+                )}
                 {isActive(item.href) && (
                   <motion.span
                     layoutId="nav-pill"

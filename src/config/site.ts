@@ -38,6 +38,7 @@ export const siteConfig = {
   nav: [
     { label: 'Home', href: '/' },
     { label: 'Packages', href: '/packages' },
+    { label: 'Tour Guide', href: '/tour-guide' },
     { label: 'Blogs', href: '/blogs' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },

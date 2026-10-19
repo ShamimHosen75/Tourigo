@@ -88,18 +88,45 @@ const spots: [string, string, GalleryItem['scene']][] = [
 ];
 
 const imageMap: Record<string, string> = {
+  // Exact matches with destination photos
   'Sajek Valley': '/images/destinations/sajek.jpg',
   "Saint Martin's Island": '/images/destinations/saint-martin.jpg',
-  "Cox's Bazar Beach": '/images/destinations/kuakata.jpg',
   'Nafakhum Waterfall': '/images/destinations/nafakhum.jpg',
-  'Nilgiri Hills': '/images/destinations/keokradong.jpg',
+  'Keokradong': '/images/destinations/keokradong.jpg',
   'Sundarbans': '/images/destinations/sundarbans.jpg',
   'Sreemangal Tea Garden': '/images/destinations/sreemangal.jpg',
   'Ratargul Swamp Forest': '/images/destinations/ratargul.jpg',
   'Tanguar Haor': '/images/destinations/tanguar-haor.jpg',
   'Kaptai Lake': '/images/destinations/kaptai.jpg',
   'Kuakata': '/images/destinations/kuakata.jpg',
+
+  // Best-match mappings using available photos
+  "Cox's Bazar Beach": '/images/destinations/kuakata.jpg',
+  'Nilgiri Hills': '/images/destinations/sajek.jpg',
+  'Boga Lake': '/images/destinations/kaptai.jpg',
+  'Jaflong': '/images/destinations/ratargul.jpg',
+  'Bichanakandi': '/images/destinations/ratargul.jpg',
+  'Lalakhal': '/images/destinations/tanguar-haor.jpg',
+  'Alutila Cave': '/images/destinations/nafakhum.jpg',
+  'Nijhum Dwip': '/images/destinations/sundarbans.jpg',
+  'Khoiyachora Waterfall': '/images/destinations/nafakhum.jpg',
+  'Sixty Dome Mosque': '/images/destinations/shimla.jpg',
+  'Paharpur Vihara': '/images/destinations/dharamshala.jpg',
+  'Mahasthangarh': '/images/destinations/shimla.jpg',
+  'Panam City': '/images/destinations/dharamshala.jpg',
+  'Lalbagh Fort': '/images/destinations/shimla.jpg',
+  'Hatirjheel': '/images/destinations/kaptai.jpg',
+  'Amiakhum Waterfall': '/images/destinations/nafakhum.jpg',
+  'Debotakhum': '/images/destinations/sreemangal.jpg',
+  'Inani Beach': '/images/destinations/saint-martin.jpg',
+  'Himchari': '/images/destinations/kuakata.jpg',
+  'Lawachara Forest': '/images/destinations/sreemangal.jpg',
+  'Madhabkunda Waterfall': '/images/destinations/nafakhum.jpg',
+  'Sonadia Island': '/images/destinations/saint-martin.jpg',
+  'Hakaluki Haor': '/images/destinations/tanguar-haor.jpg',
+  'Kantajew Temple': '/images/destinations/dharamshala.jpg',
   'Tetulia (Kanchenjunga view)': '/images/destinations/manali.jpg',
+  'Rangamati Hanging Bridge': '/images/destinations/kaptai.jpg',
 };
 
 export const galleryItems: GalleryItem[] = spots.map(([title, location, scene], i) => ({
