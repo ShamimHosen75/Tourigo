@@ -62,14 +62,13 @@ export function TourGuideExplorer({
   const originMeta = origins.find((o) => o.id === originId) || origins[0];
 
   // Locale-aware popular presets
-  const rawPresets = t('tourGuideExplorer.presets', null);
   const POPULAR_PRESETS = [
-    { from: 'dhaka',      to: 'sajek',       label: rawPresets?.[0]?.label ?? 'Dhaka → Sajek Valley',    badge: rawPresets?.[0]?.badge ?? 'Cloud Kingdom' },
-    { from: 'dhaka',      to: 'saint-martin',label: rawPresets?.[1]?.label ?? "Dhaka → Saint Martin's",  badge: rawPresets?.[1]?.badge ?? 'Coral Island' },
-    { from: 'dhaka',      to: 'coxs-bazar',  label: rawPresets?.[2]?.label ?? "Dhaka → Cox's Bazar",     badge: rawPresets?.[2]?.badge ?? '120km Beach' },
-    { from: 'dhaka',      to: 'bandarban',   label: rawPresets?.[3]?.label ?? 'Dhaka → Bandarban',       badge: rawPresets?.[3]?.badge ?? 'Adventure Trek' },
-    { from: 'chattogram', to: 'sajek',        label: rawPresets?.[4]?.label ?? 'Chattogram → Sajek',      badge: rawPresets?.[4]?.badge ?? 'Fastest Route' },
-    { from: 'sylhet',     to: 'sreemangal',  label: rawPresets?.[5]?.label ?? 'Sylhet → Sreemangal',    badge: rawPresets?.[5]?.badge ?? 'Tea Gardens' },
+    { from: 'dhaka',      to: 'sajek',       label: locale === 'bn' ? 'ঢাকা → সাজেক ভ্যালি' : 'Dhaka → Sajek Valley',    badge: locale === 'bn' ? 'মেঘের রাজ্য' : 'Cloud Kingdom' },
+    { from: 'dhaka',      to: 'saint-martin',label: locale === 'bn' ? 'ঢাকা → সেন্ট মার্টিন' : "Dhaka → Saint Martin's",  badge: locale === 'bn' ? 'প্রবাল দ্বীপ' : 'Coral Island' },
+    { from: 'dhaka',      to: 'coxs-bazar',  label: locale === 'bn' ? 'ঢাকা → কক্সবাজার' : "Dhaka → Cox's Bazar",     badge: locale === 'bn' ? '১২০ কিমি সৈকত' : '120km Beach' },
+    { from: 'dhaka',      to: 'bandarban',   label: locale === 'bn' ? 'ঢাকা → বান্দরবান' : 'Dhaka → Bandarban',       badge: locale === 'bn' ? 'অ্যাডভেঞ্চার ট্রেক' : 'Adventure Trek' },
+    { from: 'chattogram', to: 'sajek',        label: locale === 'bn' ? 'চট্টগ্রাম → সাজেক' : 'Chattogram → Sajek',      badge: locale === 'bn' ? 'সবচেয়ে দ্রুত রুট' : 'Fastest Route' },
+    { from: 'sylhet',     to: 'sreemangal',  label: locale === 'bn' ? 'সিলেট → শ্রীমঙ্গল' : 'Sylhet → Sreemangal',    badge: locale === 'bn' ? 'চা বাগান' : 'Tea Gardens' },
   ];
 
   return (
