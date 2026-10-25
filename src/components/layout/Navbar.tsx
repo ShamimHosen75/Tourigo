@@ -7,11 +7,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, Phone, X } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import { Logo } from './Logo';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -23,6 +26,25 @@ export function Navbar() {
   useEffect(() => setOpen(false), [pathname]);
 
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+
+  const getNavLabel = (href: string, fallback: string) => {
+    switch (href) {
+      case '/':
+        return t('nav.home', fallback);
+      case '/packages':
+        return t('nav.packages', fallback);
+      case '/tour-guide':
+        return t('nav.tourGuide', fallback);
+      case '/blogs':
+        return t('nav.blogs', fallback);
+      case '/about':
+        return t('nav.about', fallback);
+      case '/contact':
+        return t('nav.contact', fallback);
+      default:
+        return fallback;
+    }
+  };
 
   return (
     <nav className={`border-b bg-white/95 backdrop-blur transition-shadow ${scrolled ? 'border-slate-200 shadow-[0_6px_20px_-12px_rgba(15,23,42,.25)]' : 'border-transparent'}`}>
@@ -39,10 +61,10 @@ export function Navbar() {
                     : 'text-slate-600 hover:text-brand-600 hover:bg-slate-50'
                 }`}
               >
-                {item.label}
+                {getNavLabel(item.href, item.label)}
                 {item.href === '/tour-guide' && (
                   <span className="ml-1.5 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 px-1.5 py-0.5 text-[9px] font-black text-white shadow-xs">
-                    A-Z
+                    {t('nav.quickBadge', 'A-Z')}
                   </span>
                 )}
                 {isActive(item.href) && (
@@ -57,7 +79,9 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2.5 md:flex">
+          <LanguageSwitcher />
+
           <a
             href={siteConfig.contact.phoneHref}
             className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-brand-600 px-3 py-2 rounded-xl hover:bg-slate-50 transition-colors"
@@ -70,13 +94,16 @@ export function Navbar() {
             <span>{siteConfig.contact.phone}</span>
           </a>
           <Link href="/packages" className="btn-primary py-2.5 px-5 text-xs shadow-md shadow-brand-500/20">
-            <span>Explore Tours</span>
+            <span>{t('nav.exploreTours', 'Explore Tours')}</span>
           </Link>
         </div>
 
-        <button className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 md:hidden" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open}>
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageSwitcher compact />
+          <button className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open}>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
       <AnimatePresence>
         {open && (
@@ -85,13 +112,18 @@ export function Navbar() {
               {siteConfig.nav.map((item, i) => (
                 <motion.li key={item.href} initial={{ x: -16, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: i * 0.05 }}>
                   <Link href={item.href} className={`block rounded-xl px-4 py-3 font-medium ${isActive(item.href) ? 'bg-brand-50 text-brand-600' : 'text-ink-soft'}`}>
-                    {item.label}
+                    {getNavLabel(item.href, item.label)}
                   </Link>
                 </motion.li>
               ))}
+              <li className="pt-2">
+                <Link href="/packages" className="btn-primary w-full justify-center py-3 text-xs mb-2">
+                  <span>{t('nav.exploreTours', 'Explore Tours')}</span>
+                </Link>
+              </li>
               <li>
-                <a href={siteConfig.contact.phoneHref} className="btn-primary mt-2 w-full">
-                  <Phone className="h-4 w-4" /> Call {siteConfig.contact.phone}
+                <a href={siteConfig.contact.phoneHref} className="btn-ghost mt-1 w-full justify-center">
+                  <Phone className="h-4 w-4 text-brand-500" /> {t('common.call', 'Call')} {siteConfig.contact.phone}
                 </a>
               </li>
             </ul>

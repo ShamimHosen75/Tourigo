@@ -6,6 +6,7 @@ import { TopTicker } from '@/components/layout/TopTicker';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton';
+import { AiChatWidget } from '@/components/layout/AiChatWidget';
 import { getFeaturedPackages } from '@/lib/data';
 
 const body = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' });
@@ -24,18 +25,23 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#00aef0' };
 
+import { LanguageProvider } from '@/lib/i18n/LanguageContext';
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const featured = await getFeaturedPackages();
   return (
     <html lang="en" className={`${body.variable} ${display.variable} ${script.variable}`}>
       <body className="min-h-screen font-sans">
-        <header className="sticky top-0 z-50">
-          <TopTicker />
-          <Navbar />
-        </header>
-        <main>{children}</main>
-        <Footer featured={featured.slice(0, 5).map((p) => ({ title: p.title, slug: p.slug }))} />
-        <WhatsAppButton />
+        <LanguageProvider>
+          <header className="sticky top-0 z-50">
+            <TopTicker />
+            <Navbar />
+          </header>
+          <main>{children}</main>
+          <Footer featured={featured.slice(0, 5).map((p) => ({ title: p.title, slug: p.slug }))} />
+          <WhatsAppButton />
+          <AiChatWidget />
+        </LanguageProvider>
       </body>
     </html>
   );

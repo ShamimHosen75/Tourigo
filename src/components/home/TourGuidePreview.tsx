@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -15,17 +15,28 @@ import {
   Sparkles,
   ExternalLink,
 } from 'lucide-react';
-import { GUIDE_ORIGINS, GUIDE_DESTINATIONS, getTourRouteGuide } from '@/data/tourGuides';
+import {
+  getLocalizedTourRouteGuide,
+  getLocalizedOrigins,
+  getLocalizedDestinations,
+} from '@/data/localizedTourGuides';
 import { SectionBadge } from '@/components/ui/SectionBadge';
-import { formatPrice } from '@/config/site';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export function TourGuidePreview() {
+  const { t, locale, formatPrice } = useLanguage();
   const [fromId, setFromId] = useState('dhaka');
   const [toId, setToId] = useState('sajek');
 
-  const guide = getTourRouteGuide(fromId, toId);
-  const destMeta = GUIDE_DESTINATIONS.find((d) => d.id === toId) || GUIDE_DESTINATIONS[0];
-  const origMeta = GUIDE_ORIGINS.find((o) => o.id === fromId) || GUIDE_ORIGINS[0];
+  const origins = useMemo(() => getLocalizedOrigins(locale), [locale]);
+  const destinations = useMemo(() => getLocalizedDestinations(locale), [locale]);
+
+  const guide = useMemo(
+    () => getLocalizedTourRouteGuide(fromId, toId, locale),
+    [fromId, toId, locale]
+  );
+  const destMeta = destinations.find((d) => d.id === toId) || destinations[0];
+  const origMeta = origins.find((o) => o.id === fromId) || origins[0];
 
   const minBudget = guide.costCategories.reduce((acc, c) => acc + c.budget, 0);
 
@@ -39,14 +50,17 @@ export function TourGuidePreview() {
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center">
           <SectionBadge icon={<Compass className="h-3.5 w-3.5 text-brand-600" />}>
-            ROUTE & TRANSIT PLANNER
+            {t('tourGuide.badge', 'ROUTE & TRANSIT PLANNER')}
           </SectionBadge>
           <h2 className="section-title mt-3">
-            Plan From Origin to Destination <br />
-            <span className="accent">A to Z Tour & Transit Guide</span>
+            {t('tourGuide.title', 'Plan From Origin to Destination')} <br />
+            <span className="accent">{t('tourGuide.titleAccent', 'A to Z Tour & Transit Guide')}</span>
           </h2>
           <p className="mt-3 text-sm text-ink-soft sm:text-base leading-relaxed">
-            Curious how to reach Sajek, Saint Martin or Bandarban? Check step-by-step bus, train, Chander Gari and convoy schedules with instant cost calculations.
+            {t(
+              'tourGuide.description',
+              'Curious how to reach Sajek, Saint Martin or Bandarban? Check step-by-step bus, train, Chander Gari and convoy schedules with instant cost calculations.'
+            )}
           </p>
         </div>
 
@@ -58,16 +72,16 @@ export function TourGuidePreview() {
               {/* Origin Dropdown */}
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                  <MapPin className="h-3.5 w-3.5 text-emerald-500" /> Starting From
+                  <MapPin className="h-3.5 w-3.5 text-emerald-500" /> {t('tourGuide.originLabel', 'Starting From')}
                 </label>
                 <select
                   value={fromId}
                   onChange={(e) => setFromId(e.target.value)}
                   className="input mt-1.5 font-bold text-ink bg-white shadow-sm"
                 >
-                  {GUIDE_ORIGINS.map((orig) => (
+                  {origins.map((orig) => (
                     <option key={orig.id} value={orig.id}>
-                      {orig.name} (Gateway)
+                      {orig.name}
                     </option>
                   ))}
                 </select>
@@ -83,14 +97,14 @@ export function TourGuidePreview() {
               {/* Destination Dropdown */}
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                  <Navigation className="h-3.5 w-3.5 text-brand-500" /> Destination
+                  <Navigation className="h-3.5 w-3.5 text-brand-500" /> {t('tourGuide.destinationLabel', 'Destination')}
                 </label>
                 <select
                   value={toId}
                   onChange={(e) => setToId(e.target.value)}
                   className="input mt-1.5 font-bold text-ink bg-white shadow-sm"
                 >
-                  {GUIDE_DESTINATIONS.map((dest) => (
+                  {destinations.map((dest) => (
                     <option key={dest.id} value={dest.id}>
                       {dest.name} — {dest.tagline}
                     </option>
@@ -104,7 +118,7 @@ export function TourGuidePreview() {
                   href={`/tour-guide?from=${fromId}&to=${toId}`}
                   className="btn-primary w-full md:w-auto py-3.5 px-6 text-xs font-extrabold shadow-md shadow-brand-500/20"
                 >
-                  <span>Explore A-Z Guide</span>
+                  <span>{t('tourGuide.openFullGuide', 'Explore A-Z Guide')}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

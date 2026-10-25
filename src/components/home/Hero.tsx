@@ -7,6 +7,8 @@ import { ArrowRight, ChevronDown, CloudRain, Compass, Flower2, MapPin, Snowflake
 import { siteConfig } from '@/config/site';
 import { HeroArt, type WeatherMode } from './HeroArt';
 import { WeatherCanvas } from './WeatherCanvas';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 /* ── Weather mode config ─────────────────────────────────────────────────── */
 const modes: {
@@ -57,6 +59,8 @@ const AVATARS = [
 ];
 
 function TravelerAvatars({ className = '' }: { className?: string }) {
+  const { t, formatNumber } = useLanguage();
+
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {/* stacked avatars */}
@@ -75,7 +79,7 @@ function TravelerAvatars({ className = '' }: { className?: string }) {
         <div
           className="relative z-0 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/15 text-[10px] font-black text-white ring-2 ring-slate-950/80 backdrop-blur-sm"
         >
-          +2k
+          +{formatNumber(2)}k
         </div>
       </div>
       {/* label */}
@@ -84,10 +88,10 @@ function TravelerAvatars({ className = '' }: { className?: string }) {
           {[...Array(5)].map((_, i) => (
             <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
           ))}
-          <span className="ml-0.5 text-[11px] font-bold text-white/90">4.9</span>
+          <span className="ml-0.5 text-[11px] font-bold text-white/90">{formatNumber('4.9')}</span>
         </div>
         <p className="text-[11px] font-semibold text-white/70 leading-tight">
-          2,000+ happy travelers
+          {t('hero.travelerReviews', '2,000+ happy travelers')}
         </p>
       </div>
     </div>
@@ -96,11 +100,12 @@ function TravelerAvatars({ className = '' }: { className?: string }) {
 
 /* ── Mini trip stats bar ─────────────────────────────────────────────────── */
 function TripStats({ mode }: { mode: WeatherMode }) {
+  const { t, formatNumber } = useLanguage();
   const cfg = modes.find((m) => m.id === mode)!;
   const stats = [
-    { Icon: MapPin,   value: '36+', label: 'Destinations' },
-    { Icon: Compass,  value: '8+',  label: 'Packages'     },
-    { Icon: Star,     value: '100%', label: 'Satisfaction' },
+    { Icon: MapPin, value: `${formatNumber(36)}+`, label: t('popularPackages.statDestinations', 'Destinations') },
+    { Icon: Compass, value: `${formatNumber(8)}+`, label: t('popularPackages.statPopular', 'Packages') },
+    { Icon: Star, value: `${formatNumber(100)}%`, label: t('popularPackages.statSatisfaction', 'Satisfaction') },
   ];
   return (
     <motion.div
@@ -160,8 +165,8 @@ function ParallaxLayer({
   );
 }
 
-/* ── Main Hero ───────────────────────────────────────────────────────────── */
 export function Hero() {
+  const { t, locale, formatNumber } = useLanguage();
   const [mode, setMode] = useState<WeatherMode>('rain');
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
@@ -172,7 +177,19 @@ export function Hero() {
   const bgScale    = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
 
   const photo = siteConfig.heroImages[mode];
-  const cfg   = modes.find((m) => m.id === mode)!;
+
+  const getModeInfo = (mId: WeatherMode) => {
+    const base = modes.find((m) => m.id === mId)!;
+    const loc = translations[locale]?.hero?.weatherModes?.[mId];
+    return {
+      ...base,
+      label: loc?.label ?? base.label,
+      sublabel: loc?.sublabel ?? base.sublabel,
+      skyWord: loc?.skyWord ?? base.skyWord,
+    };
+  };
+
+  const cfg = getModeInfo(mode);
 
   return (
     <section
@@ -277,14 +294,14 @@ export function Hero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display text-[clamp(2.6rem,7vw,5.5rem)] font-black leading-[1.05] tracking-tight text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.55)]"
+            className="font-display text-[clamp(1.9rem,4.5vw,3.6rem)] font-black leading-[1.08] tracking-tight text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.55)]"
           >
-            <span className="block">Adventure Starts</span>
+            <span className="block">{t('hero.titleLine1', 'Adventure Starts')}</span>
             <span className="block">
-              With{' '}
+              {locale === 'en' ? 'With ' : ''}
               <AnimatePresence mode="wait">
                 <motion.span
-                  key={`word-${mode}`}
+                  key={`word-${mode}-${locale}`}
                   initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
                   animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
@@ -294,7 +311,7 @@ export function Hero() {
                     backgroundImage: `linear-gradient(90deg, ${cfg.accent}, #ffffff, ${cfg.accent}, #ffffff, ${cfg.accent})`,
                   }}
                 >
-                  Your Journey
+                  {t('hero.titleLine2', 'Your Journey')}
                 </motion.span>
               </AnimatePresence>
             </span>
@@ -310,8 +327,10 @@ export function Hero() {
             {/* LEFT: description + avatar */}
             <div className="flex flex-col gap-3 sm:gap-4">
               <p className="max-w-md text-sm sm:text-base font-medium leading-relaxed text-white/70">
-                Handpicked treks, guided tours & wilderness escapes across Bangladesh —
-                from the hills of Bandarban to the shores of Saint Martin.
+                {t(
+                  'hero.description',
+                  'Handpicked treks, guided tours & wilderness escapes across Bangladesh — from the hills of Bandarban to the shores of Saint Martin.'
+                )}
               </p>
               {/* Avatars — inline with heading width */}
               <TravelerAvatars />
@@ -340,7 +359,7 @@ export function Hero() {
               className={`group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r ${cfg.gradient} px-6 py-3.5 text-sm font-black text-white shadow-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl active:scale-[0.97]`}
               style={{ boxShadow: `0 12px 40px -8px ${cfg.accent}55` }}
             >
-              <span>Explore Treks &amp; Tours</span>
+              <span>{t('hero.searchButton', 'Explore Treks & Tours')}</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
 
@@ -348,7 +367,7 @@ export function Hero() {
               href="/packages"
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-5 py-3.5 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/18 hover:-translate-y-0.5 hover:border-white/35 active:scale-[0.97] shadow-lg"
             >
-              View All Packages
+              {t('common.viewAll', 'View All Packages')}
             </Link>
           </motion.div>
         </div>
@@ -370,39 +389,42 @@ export function Hero() {
             Atmosphere
           </p>
           <div className="flex items-center gap-1.5 rounded-2xl border border-white/15 bg-black/45 p-1.5 backdrop-blur-xl shadow-2xl">
-            {modes.map(({ id, label, sublabel, Icon, gradient }) => (
-              <button
-                key={id}
-                role="radio"
-                aria-checked={mode === id}
-                onClick={() => setMode(id)}
-                className={`group relative flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-all duration-300 ${
-                  mode === id
-                    ? 'border-white/20 bg-white/15 shadow-lg'
-                    : 'border-transparent hover:bg-white/8 hover:border-white/10'
-                }`}
-              >
-                {/* active indicator — bottom bar */}
-                {mode === id && (
-                  <motion.span
-                    layoutId="weather-bar"
-                    className={`absolute inset-x-3 -bottom-0.5 h-[2.5px] rounded-full bg-gradient-to-r ${gradient}`}
-                    transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                  />
-                )}
-                <div
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} shadow-md transition-transform duration-300 group-hover:scale-110`}
+            {modes.map(({ id, Icon, gradient }) => {
+              const info = getModeInfo(id);
+              return (
+                <button
+                  key={id}
+                  role="radio"
+                  aria-checked={mode === id}
+                  onClick={() => setMode(id)}
+                  className={`group relative flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-all duration-300 ${
+                    mode === id
+                      ? 'border-white/20 bg-white/15 shadow-lg'
+                      : 'border-transparent hover:bg-white/8 hover:border-white/10'
+                  }`}
                 >
-                  <Icon className="h-3.5 w-3.5 text-white" />
-                </div>
-                <div className="hidden sm:block">
-                  <p className={`text-xs font-bold leading-none ${mode === id ? 'text-white' : 'text-white/65'}`}>
-                    {label}
-                  </p>
-                  <p className="mt-0.5 text-[10px] text-white/40 leading-tight">{sublabel}</p>
-                </div>
-              </button>
-            ))}
+                  {/* active indicator — bottom bar */}
+                  {mode === id && (
+                    <motion.span
+                      layoutId="weather-bar"
+                      className={`absolute inset-x-3 -bottom-0.5 h-[2.5px] rounded-full bg-gradient-to-r ${gradient}`}
+                      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                    />
+                  )}
+                  <div
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} shadow-md transition-transform duration-300 group-hover:scale-110`}
+                  >
+                    <Icon className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className={`text-xs font-bold leading-none ${mode === id ? 'text-white' : 'text-white/65'}`}>
+                      {info.label}
+                    </p>
+                    <p className="mt-0.5 text-[10px] text-white/40 leading-tight">{info.sublabel}</p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
       </div>

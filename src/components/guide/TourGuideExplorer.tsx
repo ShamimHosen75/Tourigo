@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useId } from 'react';
+import { useState, useId, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -26,13 +26,13 @@ import {
   UtensilsCrossed,
 } from 'lucide-react';
 import {
-  GUIDE_ORIGINS,
-  GUIDE_DESTINATIONS,
-  getTourRouteGuide,
-} from '@/data/tourGuides';
+  getLocalizedTourRouteGuide,
+  getLocalizedOrigins,
+  getLocalizedDestinations,
+} from '@/data/localizedTourGuides';
 import { RouteMapVisualizer } from './RouteMapVisualizer';
 import { TourGuideCostCalculator } from './TourGuideCostCalculator';
-import { formatPrice } from '@/config/site';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface Props {
   initialOrigin?: string;
@@ -43,6 +43,7 @@ export function TourGuideExplorer({
   initialOrigin = 'dhaka',
   initialDestination = 'sajek',
 }: Props) {
+  const { t, locale, formatPrice, formatNumber } = useLanguage();
   const [originId, setOriginId] = useState<string>(initialOrigin);
   const [destId, setDestId] = useState<string>(initialDestination);
   const [activeTab, setActiveTab] = useState<'map' | 'transit' | 'cost' | 'intel' | 'faqs'>('map');
@@ -50,17 +51,25 @@ export function TourGuideExplorer({
   const originSelectId = useId();
   const destSelectId = useId();
 
-  const currentGuide = getTourRouteGuide(originId, destId);
-  const destinationMeta = GUIDE_DESTINATIONS.find((d) => d.id === destId) || GUIDE_DESTINATIONS[0];
-  const originMeta = GUIDE_ORIGINS.find((o) => o.id === originId) || GUIDE_ORIGINS[0];
+  const origins = useMemo(() => getLocalizedOrigins(locale), [locale]);
+  const destinations = useMemo(() => getLocalizedDestinations(locale), [locale]);
 
+  const currentGuide = useMemo(
+    () => getLocalizedTourRouteGuide(originId, destId, locale),
+    [originId, destId, locale]
+  );
+  const destinationMeta = destinations.find((d) => d.id === destId) || destinations[0];
+  const originMeta = origins.find((o) => o.id === originId) || origins[0];
+
+  // Locale-aware popular presets
+  const rawPresets = t('tourGuideExplorer.presets', null);
   const POPULAR_PRESETS = [
-    { from: 'dhaka', to: 'sajek', label: 'Dhaka → Sajek Valley', badge: 'Cloud Kingdom' },
-    { from: 'dhaka', to: 'saint-martin', label: "Dhaka → Saint Martin's", badge: 'Coral Island' },
-    { from: 'dhaka', to: 'coxs-bazar', label: "Dhaka → Cox's Bazar", badge: '120km Beach' },
-    { from: 'dhaka', to: 'bandarban', label: 'Dhaka → Bandarban', badge: 'Adventure Trek' },
-    { from: 'chattogram', to: 'sajek', label: 'Chattogram → Sajek', badge: 'Fastest Route' },
-    { from: 'sylhet', to: 'sreemangal', label: 'Sylhet → Sreemangal', badge: 'Tea Gardens' },
+    { from: 'dhaka',      to: 'sajek',       label: rawPresets?.[0]?.label ?? 'Dhaka → Sajek Valley',    badge: rawPresets?.[0]?.badge ?? 'Cloud Kingdom' },
+    { from: 'dhaka',      to: 'saint-martin',label: rawPresets?.[1]?.label ?? "Dhaka → Saint Martin's",  badge: rawPresets?.[1]?.badge ?? 'Coral Island' },
+    { from: 'dhaka',      to: 'coxs-bazar',  label: rawPresets?.[2]?.label ?? "Dhaka → Cox's Bazar",     badge: rawPresets?.[2]?.badge ?? '120km Beach' },
+    { from: 'dhaka',      to: 'bandarban',   label: rawPresets?.[3]?.label ?? 'Dhaka → Bandarban',       badge: rawPresets?.[3]?.badge ?? 'Adventure Trek' },
+    { from: 'chattogram', to: 'sajek',        label: rawPresets?.[4]?.label ?? 'Chattogram → Sajek',      badge: rawPresets?.[4]?.badge ?? 'Fastest Route' },
+    { from: 'sylhet',     to: 'sreemangal',  label: rawPresets?.[5]?.label ?? 'Sylhet → Sreemangal',    badge: rawPresets?.[5]?.badge ?? 'Tea Gardens' },
   ];
 
   return (
@@ -70,16 +79,16 @@ export function TourGuideExplorer({
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50/80 px-3.5 py-1.5 text-xs font-bold text-brand-700">
             <Compass className="h-3.5 w-3.5 text-brand-600" />
-            <span>A to Z Tour Guide & Transit Master System</span>
+            <span>{t('tourGuideExplorer.masterBadge', 'A to Z Tour Guide & Transit Master System')}</span>
           </div>
           <h1 className="mt-4 font-display text-3xl font-black tracking-tight text-ink sm:text-4xl md:text-5xl">
-            From Location to Destination <br />
+            {t('tourGuideExplorer.heroTitle', 'From Location to Destination')} <br />
             <span className="accent bg-gradient-to-r from-brand-600 via-cyan-600 to-amber-500 bg-clip-text text-transparent">
-              Complete Transit & Cost Guide
+              {t('tourGuideExplorer.heroTitleAccent', 'Complete Transit & Cost Guide')}
             </span>
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-ink-soft sm:text-base">
-            Select your starting city and destination to explore verified step-by-step transportation routes, bus & train schedules, military convoy timings, and an interactive budget calculator.
+            {t('tourGuideExplorer.heroDesc', 'Select your starting city and destination to explore verified step-by-step transportation routes, bus & train schedules, military convoy timings, and an interactive budget calculator.')}
           </p>
         </div>
 
@@ -89,7 +98,7 @@ export function TourGuideExplorer({
             {/* From Origin */}
             <div>
               <label htmlFor={originSelectId} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                <MapPin className="h-3.5 w-3.5 text-emerald-500" /> From (Origin City)
+                <MapPin className="h-3.5 w-3.5 text-emerald-500" /> {t('tourGuideExplorer.fromLabel', 'From (Origin City)')}
               </label>
               <select
                 id={originSelectId}
@@ -97,7 +106,7 @@ export function TourGuideExplorer({
                 onChange={(e) => setOriginId(e.target.value)}
                 className="input mt-2 font-bold text-ink"
               >
-                {GUIDE_ORIGINS.map((orig) => (
+                {origins.map((orig) => (
                   <option key={orig.id} value={orig.id}>
                     {orig.name} ({orig.departureHubs.slice(0, 2).join(', ')})
                   </option>
@@ -115,7 +124,7 @@ export function TourGuideExplorer({
             {/* To Destination */}
             <div>
               <label htmlFor={destSelectId} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                <Navigation className="h-3.5 w-3.5 text-brand-500" /> To (Destination)
+                <Navigation className="h-3.5 w-3.5 text-brand-500" /> {t('tourGuideExplorer.toLabel', 'To (Destination)')}
               </label>
               <select
                 id={destSelectId}
@@ -123,7 +132,7 @@ export function TourGuideExplorer({
                 onChange={(e) => setDestId(e.target.value)}
                 className="input mt-2 font-bold text-ink"
               >
-                {GUIDE_DESTINATIONS.map((dest) => (
+                {destinations.map((dest) => (
                   <option key={dest.id} value={dest.id}>
                     {dest.name} — {dest.tagline}
                   </option>
@@ -135,7 +144,7 @@ export function TourGuideExplorer({
           {/* Popular Route Presets Chips */}
           <div className="mt-5 border-t border-slate-100 pt-4">
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-mute">
-              Popular Route Shortcuts:
+              {t('tourGuideExplorer.popularShortcuts', 'Popular Route Shortcuts:')}
             </span>
             <div className="mt-2 flex flex-wrap gap-2">
               {POPULAR_PRESETS.map((p) => {
@@ -170,7 +179,7 @@ export function TourGuideExplorer({
         <div>
           <div className="flex items-center gap-2">
             <span className="chip bg-brand-600 text-white text-[11px] font-extrabold uppercase tracking-wide">
-              Selected Route
+              {t('tourGuideExplorer.selectedRoute', 'Selected Route')}
             </span>
             <span className="text-xs font-bold text-ink-mute">
               {originMeta.name} ➔ {destinationMeta.name}
@@ -190,7 +199,7 @@ export function TourGuideExplorer({
             className="btn-primary py-2.5 px-5 text-xs shadow-md shadow-brand-500/20 shrink-0"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Book Guided Package</span>
+            <span>{t('tourGuideExplorer.bookGuided', 'Book Guided Package')}</span>
           </Link>
         )}
       </section>
@@ -199,11 +208,11 @@ export function TourGuideExplorer({
       <div className="sticky top-[calc(var(--header-h)+8px)] z-20 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-md backdrop-blur">
         <div className="no-scrollbar flex gap-1 overflow-x-auto" role="tablist">
           {[
-            { id: 'map', label: 'Route Map & Stops', icon: MapPin },
-            { id: 'transit', label: 'A-Z Transit Roadmap', icon: Bus },
-            { id: 'cost', label: 'Cost Breakdown & Calculator', icon: CreditCard },
-            { id: 'intel', label: 'Survival & Travel Intel', icon: Smartphone },
-            { id: 'faqs', label: 'Route FAQs', icon: HelpCircle },
+            { id: 'map',     label: t('tourGuideExplorer.tabMap',     'Route Map & Stops'),             icon: MapPin },
+            { id: 'transit', label: t('tourGuideExplorer.tabTransit', 'A-Z Transit Roadmap'),           icon: Bus },
+            { id: 'cost',    label: t('tourGuideExplorer.tabCost',    'Cost Breakdown & Calculator'),   icon: CreditCard },
+            { id: 'intel',   label: t('tourGuideExplorer.tabIntel',   'Survival & Travel Intel'),       icon: Smartphone },
+            { id: 'faqs',    label: t('tourGuideExplorer.tabFaqs',    'Route FAQs'),                    icon: HelpCircle },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -243,10 +252,10 @@ export function TourGuideExplorer({
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h3 className="text-lg font-black text-ink sm:text-xl">
-                  Step-by-Step Transit Process (How to Reach)
+                  {t('tourGuideExplorer.transitTitle', 'Step-by-Step Transit Process (How to Reach)')}
                 </h3>
                 <p className="text-xs text-ink-mute">
-                  Detailed roadmap covering every leg, transit vehicles, departure counters, and military or ferry schedules.
+                  {t('tourGuideExplorer.transitDesc', 'Detailed roadmap covering every leg, transit vehicles, departure counters, and military or ferry schedules.')}
                 </p>
               </div>
             </div>
@@ -271,7 +280,7 @@ export function TourGuideExplorer({
                           </span>
                           {step.distanceKm && (
                             <span className="chip bg-slate-100 text-ink-soft text-[11px]">
-                              {step.distanceKm} km
+                              {formatNumber(step.distanceKm)} {t('common.km', 'km')}
                             </span>
                           )}
                         </div>
@@ -282,7 +291,7 @@ export function TourGuideExplorer({
 
                       {/* Estimated Fare for this leg */}
                       <div className="rounded-xl border border-slate-200 bg-white p-2.5 text-right sm:min-w-[160px]">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute">Leg Fare</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute">{t('tourGuideExplorer.legFare', 'Leg Fare')}</span>
                         <p className="text-sm font-extrabold text-emerald-600">
                           {formatPrice(step.costEstimate.budget)} – {formatPrice(step.costEstimate.standard)}
                         </p>
@@ -293,7 +302,7 @@ export function TourGuideExplorer({
                     {step.timingNotes && (
                       <div className="mt-3 flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/60 p-2.5 text-xs text-blue-800">
                         <Clock className="h-4 w-4 shrink-0 text-blue-600" />
-                        <span><strong>Schedule Timing:</strong> {step.timingNotes}</span>
+                        <span><strong>{t('tourGuideExplorer.scheduleLabel', 'Schedule Timing:')}</strong> {step.timingNotes}</span>
                       </div>
                     )}
 
@@ -301,7 +310,7 @@ export function TourGuideExplorer({
                     {step.warnings && (
                       <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
                         <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
-                        <span><strong>Important Caution:</strong> {step.warnings}</span>
+                        <span><strong>{t('tourGuideExplorer.cautionLabel', 'Important Caution:')}</strong> {step.warnings}</span>
                       </div>
                     )}
 
@@ -319,7 +328,7 @@ export function TourGuideExplorer({
                     {step.countersOrStations && step.countersOrStations.length > 0 && (
                       <div className="mt-4 border-t border-slate-200/60 pt-3">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute">
-                          Recommended Operators & Counters:
+                          {t('tourGuideExplorer.recommendedOps', 'Recommended Operators & Counters:')}
                         </span>
                         <div className="mt-1.5 flex flex-wrap gap-1.5">
                           {step.countersOrStations.map((counter, idx) => (
@@ -339,10 +348,10 @@ export function TourGuideExplorer({
           {/* Transit Modes Comparison Table */}
           <div className="card p-6 sm:p-8">
             <h3 className="text-lg font-black text-ink sm:text-xl">
-              Transportation Options Comparison
+              {t('tourGuideExplorer.transitOptions', 'Transportation Options Comparison')}
             </h3>
             <p className="mt-1 text-xs text-ink-mute">
-              Compare speed, ticket costs, schedule frequencies, and comfort levels across available transit modes.
+              {t('tourGuideExplorer.transitOptionsDesc', 'Compare speed, ticket costs, schedule frequencies, and comfort levels across available transit modes.')}
             </p>
 
             <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -364,7 +373,7 @@ export function TourGuideExplorer({
                   <p className="mt-2 text-xs text-ink-mute leading-relaxed">{opt.schedule}</p>
 
                   <div className="mt-4 space-y-1.5 text-xs">
-                    <p className="font-bold text-emerald-700">Advantages:</p>
+                    <p className="font-bold text-emerald-700">{t('tourGuideExplorer.advantages', 'Advantages:')}</p>
                     {opt.pros.map((p, idx) => (
                       <p key={idx} className="text-ink-soft text-[11px] flex items-center gap-1.5">
                         <span className="text-emerald-500 font-bold">✓</span> {p}
@@ -373,7 +382,7 @@ export function TourGuideExplorer({
                   </div>
 
                   <div className="mt-3 rounded-xl bg-slate-50 p-2 text-[11px] text-ink-soft">
-                    <strong>Best For:</strong> {opt.recommendedFor}
+                    <strong>{t('tourGuideExplorer.bestFor', 'Best For:')}</strong> {opt.recommendedFor}
                   </div>
                 </div>
               ))}
@@ -400,8 +409,8 @@ export function TourGuideExplorer({
                   <Smartphone className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-ink">Mobile Network & SIM Reality</h3>
-                  <p className="text-xs text-ink-mute">Signal availability across hill tracts & islands</p>
+                  <h3 className="font-extrabold text-ink">{t('tourGuideExplorer.networkTitle', 'Mobile Network & SIM Reality')}</h3>
+                  <p className="text-xs text-ink-mute">{t('tourGuideExplorer.networkDesc', 'Signal availability across hill tracts & islands')}</p>
                 </div>
               </div>
               <div className="mt-5 space-y-3">
@@ -426,13 +435,13 @@ export function TourGuideExplorer({
                   <CreditCard className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-ink">Cash & ATM Alert</h3>
-                  <p className="text-xs text-ink-mute">Important currency & payment notice</p>
+                  <h3 className="font-extrabold text-ink">{t('tourGuideExplorer.cashTitle', 'Cash & ATM Alert')}</h3>
+                  <p className="text-xs text-ink-mute">{t('tourGuideExplorer.cashDesc', 'Important currency & payment notice')}</p>
                 </div>
               </div>
               <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900 leading-relaxed">
                 <p className="font-extrabold text-sm text-amber-950 flex items-center gap-1.5">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" /> Cash is Essential
+                  <AlertTriangle className="h-4 w-4 text-amber-600" /> {t('tourGuideExplorer.cashEssential', 'Cash is Essential')}
                 </p>
                 <p className="mt-2">{currentGuide.travelIntel.atmStatus}</p>
               </div>
@@ -440,11 +449,11 @@ export function TourGuideExplorer({
               {/* Best Season */}
               <div className="mt-5 space-y-2">
                 <div className="rounded-xl border border-slate-100 bg-white p-3 text-xs">
-                  <span className="font-bold text-ink">Best Time to Visit:</span>
+                  <span className="font-bold text-ink">{t('tourGuideExplorer.bestTime', 'Best Time to Visit:')}</span>
                   <p className="mt-0.5 text-ink-soft">{currentGuide.travelIntel.bestTimeToVisit}</p>
                 </div>
                 <div className="rounded-xl border border-slate-100 bg-white p-3 text-xs">
-                  <span className="font-bold text-ink">Peak Season:</span>
+                  <span className="font-bold text-ink">{t('tourGuideExplorer.peakSeason', 'Peak Season:')}</span>
                   <p className="mt-0.5 text-ink-soft">{currentGuide.travelIntel.peakSeason}</p>
                 </div>
               </div>
@@ -460,8 +469,8 @@ export function TourGuideExplorer({
                   <Shield className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-ink">Permits & Mandatory NID</h3>
-                  <p className="text-xs text-ink-mute">Army checkposts & local registrations</p>
+                  <h3 className="font-extrabold text-ink">{t('tourGuideExplorer.permitsTitle', 'Permits & Mandatory NID')}</h3>
+                  <p className="text-xs text-ink-mute">{t('tourGuideExplorer.permitsDesc', 'Army checkposts & local registrations')}</p>
                 </div>
               </div>
               <ul className="mt-5 space-y-2.5 text-xs text-ink-soft">
@@ -481,8 +490,8 @@ export function TourGuideExplorer({
                   <Luggage className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-ink">What to Pack (A to Z Gear)</h3>
-                  <p className="text-xs text-ink-mute">Essential items you must carry</p>
+                  <h3 className="font-extrabold text-ink">{t('tourGuideExplorer.packingTitle', 'What to Pack (A to Z Gear)')}</h3>
+                  <p className="text-xs text-ink-mute">{t('tourGuideExplorer.packingDesc', 'Essential items you must carry')}</p>
                 </div>
               </div>
               <ul className="mt-5 space-y-2 text-xs text-ink-soft">
@@ -503,8 +512,8 @@ export function TourGuideExplorer({
                 <UtensilsCrossed className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-extrabold text-ink">Must-Try Culinary Delicacies</h3>
-                <p className="text-xs text-ink-mute">Authentic local dishes and estimated prices</p>
+                <h3 className="font-extrabold text-ink">{t('tourGuideExplorer.delicaciesTitle', 'Must-Try Culinary Delicacies')}</h3>
+                <p className="text-xs text-ink-mute">{t('tourGuideExplorer.delicaciesDesc', 'Authentic local dishes and estimated prices')}</p>
               </div>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -530,8 +539,8 @@ export function TourGuideExplorer({
               <HelpCircle className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-ink">Frequently Asked Questions</h3>
-              <p className="text-xs text-ink-mute">Common inquiries for the {currentGuide.routeTitle}</p>
+              <h3 className="text-lg font-black text-ink">{t('tourGuideExplorer.faqTitle', 'Frequently Asked Questions')}</h3>
+              <p className="text-xs text-ink-mute">{t('tourGuideExplorer.faqDesc', 'Common inquiries for the')} {currentGuide.routeTitle}</p>
             </div>
           </div>
           <div className="mt-6 space-y-4">
@@ -550,13 +559,13 @@ export function TourGuideExplorer({
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="max-w-2xl text-center md:text-left">
             <span className="chip bg-white/20 text-white text-[11px] font-extrabold uppercase tracking-wider">
-              Zero Stress Travel
+              {t('tourGuideExplorer.ctaBadge', 'Zero Stress Travel')}
             </span>
             <h3 className="mt-3 font-display text-2xl font-black sm:text-3xl">
-              Prefer a 100% Hassle-Free Guided Experience?
+              {t('tourGuideExplorer.ctaTitle', 'Prefer a 100% Hassle-Free Guided Experience?')}
             </h3>
             <p className="mt-2 text-xs sm:text-sm text-cyan-50 leading-relaxed">
-              Skip booking multiple separate buses, negotiating jeep rentals at counters, and guessing military escort hours. Tourigo takes care of AC transport, mountain jeeps, prime ridge resorts, all meals, and experienced trek leaders.
+              {t('tourGuideExplorer.ctaDesc', 'Skip booking multiple separate buses, negotiating jeep rentals at counters, and guessing military escort hours. Tourigo takes care of AC transport, mountain jeeps, prime ridge resorts, all meals, and experienced trek leaders.')}
             </p>
           </div>
 
@@ -566,7 +575,7 @@ export function TourGuideExplorer({
                 href={`/packages/${destinationMeta.packageSlug}`}
                 className="btn-ghost bg-white text-brand-600 hover:bg-slate-100 px-6 py-3.5 text-sm font-extrabold shadow-lg"
               >
-                <span>View {destinationMeta.name} Package</span>
+                <span>{t('tourGuideExplorer.viewPackage', '{name} Package').replace('{name}', destinationMeta.name)}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             ) : (
@@ -574,7 +583,7 @@ export function TourGuideExplorer({
                 href="/packages"
                 className="btn-ghost bg-white text-brand-600 hover:bg-slate-100 px-6 py-3.5 text-sm font-extrabold shadow-lg"
               >
-                <span>Explore All Packages</span>
+                <span>{t('tourGuideExplorer.exploreAll', 'Explore All Packages')}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             )}
@@ -583,7 +592,7 @@ export function TourGuideExplorer({
               className="inline-flex items-center gap-2 rounded-2xl border border-white/40 bg-white/10 px-5 py-3.5 text-sm font-bold text-white backdrop-blur hover:bg-white/20 transition"
             >
               <PhoneCall className="h-4 w-4" />
-              <span>Talk to Tour Guide</span>
+              <span>{t('tourGuideExplorer.talkGuide', 'Talk to Tour Guide')}</span>
             </Link>
           </div>
         </div>

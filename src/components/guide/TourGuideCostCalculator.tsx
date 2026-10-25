@@ -19,7 +19,7 @@ import {
   Info,
 } from 'lucide-react';
 import type { TourRouteGuide, CostCategory } from '@/types/tourGuide';
-import { formatPrice } from '@/config/site';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 function getCategoryIcon(name: string) {
   switch (name) {
@@ -40,6 +40,7 @@ function getCategoryIcon(name: string) {
 }
 
 export function TourGuideCostCalculator({ guide }: { guide: TourRouteGuide }) {
+  const { t, formatPrice, formatNumber, locale } = useLanguage();
   const [tier, setTier] = useState<'budget' | 'standard' | 'luxury'>('standard');
   const [travelers, setTravelers] = useState<number>(4);
   const [days, setDays] = useState<number>(guide.recommendedDays || 3);
@@ -118,13 +119,15 @@ Generated via Tourigo Route & Cost Planner`;
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black text-ink sm:text-xl">A to Z Dynamic Cost Calculator</h3>
+              <h3 className="text-lg font-black text-ink sm:text-xl">
+                {t('tourGuideExplorer.calcTitle', 'A to Z Dynamic Cost Calculator')}
+              </h3>
               <span className="chip bg-emerald-50 text-[10px] font-bold uppercase tracking-wider text-emerald-600">
-                Live Estimation
+                {t('tourGuideExplorer.liveEstimation', 'Live Estimation')}
               </span>
             </div>
             <p className="text-xs text-ink-mute">
-              Adjust group size, travel style and duration for real-time itemized cost breakdowns.
+              {t('tourGuideExplorer.calcDesc', 'Adjust group size, travel style and duration for real-time itemized cost breakdowns.')}
             </p>
           </div>
         </div>
@@ -137,12 +140,12 @@ Generated via Tourigo Route & Cost Planner`;
           {copied ? (
             <>
               <Check className="h-4 w-4 text-emerald-600" />
-              <span className="text-emerald-600">Budget Copied!</span>
+              <span className="text-emerald-600">{t('tourGuideExplorer.budgetCopied', 'Budget Copied!')}</span>
             </>
           ) : (
             <>
               <Copy className="h-4 w-4" />
-              <span>Copy Budget</span>
+              <span>{t('tourGuideExplorer.copyBudget', 'Copy Budget')}</span>
             </>
           )}
         </button>
@@ -153,27 +156,27 @@ Generated via Tourigo Route & Cost Planner`;
         {/* Travel Style Tier */}
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-ink-soft">
-            1. Travel Style
+            {t('tourGuideExplorer.travelStyle', '1. Travel Style')}
           </label>
           <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-2xl border border-slate-200 bg-slate-50 p-1">
-            {(['budget', 'standard', 'luxury'] as const).map((t) => (
+            {(['budget', 'standard', 'luxury'] as const).map((tVal) => (
               <button
-                key={t}
-                onClick={() => setTier(t)}
+                key={tVal}
+                onClick={() => setTier(tVal)}
                 className={`rounded-xl py-2 text-xs font-bold capitalize transition ${
-                  tier === t
+                  tier === tVal
                     ? 'bg-white text-brand-600 shadow-sm ring-1 ring-slate-200'
                     : 'text-slate-500 hover:text-ink'
                 }`}
               >
-                {t}
+                {tVal}
               </button>
             ))}
           </div>
           <p className="mt-1.5 text-[11px] text-ink-mute">
-            {tier === 'budget' && 'Non-AC coach, shared jeeps & homestays'}
-            {tier === 'standard' && 'AC coach, comfortable hotel & shared transfer'}
-            {tier === 'luxury' && 'Private reserve vehicle, top view resort & feasts'}
+            {tier === 'budget' && (locale === 'bn' ? 'নন-এসি কোচ, শেয়ারিং জিপ ও হোমস্টে' : 'Non-AC coach, shared jeeps & homestays')}
+            {tier === 'standard' && (locale === 'bn' ? 'এসি কোচ, স্বাচ্ছন্দ্যময় হোটেল ও শেয়ারিং গাড়ি' : 'AC coach, comfortable hotel & shared transfer')}
+            {tier === 'luxury' && (locale === 'bn' ? 'প্রাইভেট রিজার্ভ গাড়ি, সেরা ভিউ রিসোর্ট ও ভোজ' : 'Private reserve vehicle, top view resort & feasts')}
           </p>
         </div>
 
@@ -181,11 +184,11 @@ Generated via Tourigo Route & Cost Planner`;
         <div>
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold uppercase tracking-wider text-ink-soft">
-              2. Travelers: <span className="text-brand-600 font-extrabold">{travelers} Person{travelers > 1 ? 's' : ''}</span>
+              {t('tourGuideExplorer.travelersCount', '2. Travelers:')} <span className="text-brand-600 font-extrabold">{formatNumber(travelers)} {locale === 'bn' ? 'জন' : travelers > 1 ? 'Persons' : 'Person'}</span>
             </label>
             {travelers >= 4 && (
               <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5">
-                <TrendingDown className="h-3 w-3" /> Group savings active
+                <TrendingDown className="h-3 w-3" /> {locale === 'bn' ? 'দলগত সঞ্চয় সক্রিয়' : 'Group savings active'}
               </span>
             )}
           </div>
@@ -199,18 +202,18 @@ Generated via Tourigo Route & Cost Planner`;
               className="h-2 w-full cursor-pointer accent-brand-500"
             />
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-xs font-extrabold text-ink">
-              {travelers}
+              {formatNumber(travelers)}
             </span>
           </div>
           <p className="mt-1.5 text-[11px] text-ink-mute">
-            Jeeps & boathouse rentals automatically split among group members.
+            {locale === 'bn' ? 'জিপ ও বোট ভাড়া দলের সদস্যদের মধ্যে স্বয়ংক্রিয়ভাবে ভাগ হয়ে যায়।' : 'Jeeps & boathouse rentals automatically split among group members.'}
           </p>
         </div>
 
         {/* Trip Duration */}
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-ink-soft">
-            3. Duration
+            {t('tourGuideExplorer.tripDuration', '3. Duration')}
           </label>
           <div className="mt-2 grid grid-cols-3 gap-1.5 rounded-2xl border border-slate-200 bg-slate-50 p-1">
             {[2, 3, 4].map((d) => (
@@ -223,12 +226,12 @@ Generated via Tourigo Route & Cost Planner`;
                     : 'text-slate-500 hover:text-ink'
                 }`}
               >
-                {d}D / {d - 1}N
+                {formatNumber(d)}{locale === 'bn' ? 'দিন / ' : 'D / '}{formatNumber(d - 1)}{locale === 'bn' ? 'রাত' : 'N'}
               </button>
             ))}
           </div>
           <p className="mt-1.5 text-[11px] text-ink-mute">
-            Standard recommended duration: {guide.recommendedDays} Days.
+            {locale === 'bn' ? `স্ট্যান্ডার্ড প্রস্তাবিত ভ্রমণ: ${formatNumber(guide.recommendedDays)} দিন।` : `Standard recommended duration: ${guide.recommendedDays} Days.`}
           </p>
         </div>
       </div>
@@ -238,25 +241,29 @@ Generated via Tourigo Route & Cost Planner`;
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <span className="chip bg-white/10 text-cyan-300 text-[10px] font-bold uppercase tracking-wider">
-              Calculated Estimate ({tier.toUpperCase()} TIER)
+              {t('tourGuideExplorer.calculatedEstimate', 'Calculated Estimate')} ({tier.toUpperCase()})
             </span>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-3xl font-black text-white sm:text-4xl">
                 {formatPrice(totalPerPerson)}
               </span>
-              <span className="text-xs text-slate-300">/ person estimated</span>
+              <span className="text-xs text-slate-300">{t('tourGuideExplorer.perPersonEst', '/ person estimated')}</span>
             </div>
             <p className="mt-1 text-xs text-slate-300">
-              Total group budget: <strong className="text-emerald-400 font-extrabold">{formatPrice(totalGroupAmount)}</strong> for {travelers} traveler{travelers > 1 ? 's' : ''} across {days} Days.
+              {locale === 'bn' ? (
+                <>দলের মোট বাজেট: <strong className="text-emerald-400 font-extrabold">{formatPrice(totalGroupAmount)}</strong> ({formatNumber(travelers)} জন, {formatNumber(days)} দিন)</>
+              ) : (
+                <>Total group budget: <strong className="text-emerald-400 font-extrabold">{formatPrice(totalGroupAmount)}</strong> for {travelers} traveler{travelers > 1 ? 's' : ''} across {days} Days.</>
+              )}
             </p>
           </div>
 
           <div className="rounded-xl border border-white/10 bg-white/5 p-3.5 backdrop-blur sm:min-w-[200px]">
             <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
-              Tourigo All-Inclusive Alternative
+              {locale === 'bn' ? 'ট্যুরিগো ঝামেলাহীন বিকল্প' : 'Tourigo All-Inclusive Alternative'}
             </p>
             <p className="mt-0.5 text-xs text-slate-200">
-              Zero stress. No counter haggling. Guaranteed military convoy slot & verified scenic resort.
+              {locale === 'bn' ? 'কোনো স্ট্রেস নেই। কাউন্টারে দরকষাকষির ঝামেলা নেই। নিশ্চিত কনভয় স্লট ও ভিউ রিসোর্ট।' : 'Zero stress. No counter haggling. Guaranteed military convoy slot & verified scenic resort.'}
             </p>
           </div>
         </div>
@@ -265,7 +272,7 @@ Generated via Tourigo Route & Cost Planner`;
       {/* Itemized Cost Breakdown Table */}
       <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/80">
         <div className="bg-slate-50 px-5 py-3 text-xs font-bold uppercase tracking-wider text-ink-soft">
-          Itemized Cost Breakdown ({travelers} Person{travelers > 1 ? 's' : ''}, {days} Days)
+          {t('tourGuideExplorer.itemizedBreakdown', 'Itemized Cost Breakdown')} ({formatNumber(travelers)} {locale === 'bn' ? 'জন' : 'Persons'}, {formatNumber(days)} {locale === 'bn' ? 'দিন' : 'Days'})
         </div>
         <div className="divide-y divide-slate-100 bg-white">
           {computedItems.map((item) => {
@@ -283,7 +290,7 @@ Generated via Tourigo Route & Cost Planner`;
                       <p className="text-sm font-bold text-ink">{item.name}</p>
                       {item.unit === 'per_group' && (
                         <span className="chip bg-blue-50 text-[10px] font-semibold text-blue-600">
-                          Shared Group Cost
+                          {t('tourGuideExplorer.sharedGroupCost', 'Shared Group Cost')}
                         </span>
                       )}
                     </div>
@@ -296,13 +303,13 @@ Generated via Tourigo Route & Cost Planner`;
                     <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
                       <div className="h-full bg-brand-500 rounded-full" style={{ width: `${percentage}%` }} />
                     </div>
-                    <span className="text-[10px] text-ink-mute">{percentage}% of total</span>
+                    <span className="text-[10px] text-ink-mute">{formatNumber(percentage)}% {t('tourGuideExplorer.ofTotal', 'of total')}</span>
                   </div>
 
                   <div>
                     <p className="text-sm font-extrabold text-ink">{formatPrice(item.perPersonAmount)}</p>
                     <p className="text-[11px] text-ink-mute">
-                      Total: {formatPrice(item.totalCategoryAmount)}
+                      {t('tourGuideExplorer.totalLabel', 'Total:')} {formatPrice(item.totalCategoryAmount)}
                     </p>
                   </div>
                 </div>

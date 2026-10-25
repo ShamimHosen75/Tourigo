@@ -1,10 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import { ExternalLink, Mail, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { translations } from '@/lib/i18n/translations';
 
 // Thin dark announcement bar that scrolls forever (duplicated list + CSS marquee).
 export function TopTicker() {
-  const items = [...siteConfig.announcements, ...siteConfig.announcements, ...siteConfig.announcements];
+  const { locale } = useLanguage();
+  const rawList = translations[locale]?.announcements || siteConfig.announcements;
+  const items = [...rawList, ...rawList, ...rawList];
+
   return (
     <div className="flex h-9 items-center bg-slate-950 text-[12px] font-medium text-white">
       <div className="relative flex-1 overflow-hidden">

@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Info, Mountain, RefreshCw, TrendingUp, Users } from 'lucide-react';
-import { formatPrice } from '@/config/site';
 import type { Package } from '@/lib/types';
 import { SmartImage } from '@/components/ui/SmartImage';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export type CardPackage = Pick<
   Package,
@@ -25,17 +25,12 @@ export type CardPackage = Pick<
   | 'badge'
 > & { image?: string };
 
-/**
- * Modern travel card with realistic photography matching the clean OTA card design:
- * - High-res top photo with floating dark pill badge
- * - Crisp white card body with bold destination title & 2-line highlights
- * - Bottom row with bold "From ৳..." pricing and "View Tours →" link
- * - Optional 3D flip button to view trek altitude, duration & inclusions
- */
 export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
+  const { t, formatPrice, formatNumber } = useLanguage();
   const [flipped, setFlipped] = useState(false);
-  const days = `${pkg.durationDays}D / ${pkg.durationNights ?? Math.max(1, pkg.durationDays - 1)}N`;
-  const badgeText = pkg.badge || (pkg.level === 'Beginner' ? 'Most Popular' : pkg.level);
+  const nightsNum = pkg.durationNights ?? Math.max(1, pkg.durationDays - 1);
+  const days = `${formatNumber(pkg.durationDays)}D / ${formatNumber(nightsNum)}N`;
+  const badgeText = pkg.badge || (pkg.level === 'Beginner' ? t('flipCard.mostPopular', 'Most Popular') : pkg.level);
 
   return (
     <div className="group h-[430px] [perspective:1400px]">
@@ -98,7 +93,9 @@ export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
             {/* Bottom row: "From ৳..." + "View Tours →" */}
             <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between">
               <div className="flex items-baseline gap-1">
-                <span className="text-xs sm:text-sm font-semibold text-slate-700">From</span>
+                <span className="text-xs sm:text-sm font-semibold text-slate-700">
+                  {t('flipCard.from', 'From')}
+                </span>
                 <span className="font-bold text-slate-900 text-lg sm:text-xl font-display tracking-tight">
                   {formatPrice(pkg.price)}
                 </span>
@@ -108,7 +105,7 @@ export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
                 href={`/packages/${pkg.slug}`}
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-cyan-600 hover:text-cyan-700 group-hover:gap-2 transition-all"
               >
-                <span>View Tours</span>
+                <span>{t('flipCard.viewTours', 'View Tours')}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
@@ -120,14 +117,14 @@ export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="inline-block rounded-full bg-cyan-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-cyan-300 border border-cyan-500/30">
-                Tour Overview
+                {t('flipCard.tourOverview', 'Tour Overview')}
               </span>
               <h3 className="mt-1.5 text-base font-bold leading-tight">{pkg.title}</h3>
             </div>
             <button
               type="button"
               onClick={() => setFlipped(false)}
-              aria-label="Back to card"
+              aria-label={t('flipCard.backToCard', 'Back to card')}
               className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
             >
               <RefreshCw className="h-3.5 w-3.5" />
@@ -137,7 +134,7 @@ export function PackageFlipCard({ pkg }: { pkg: CardPackage }) {
           <p className="mt-2.5 line-clamp-3 text-xs leading-relaxed text-slate-300">{pkg.shortDescription}</p>
 
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <Spec icon={<Calendar className="h-3.5 w-3.5" />} label="Duration" value={days} />
+            <Spec icon={<Calendar className="h-3.5 w-3.5" />} label={t('flipCard.duration', 'Duration')} value={days} />
             <Spec icon={<Mountain className="h-3.5 w-3.5" />} label="Altitude" value={pkg.altitude ?? 'N/A'} />
             <Spec icon={<TrendingUp className="h-3.5 w-3.5" />} label="Difficulty" value={pkg.level} />
             <Spec icon={<Users className="h-3.5 w-3.5" />} label="Category" value={pkg.gender} highlight />

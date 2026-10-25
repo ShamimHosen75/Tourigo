@@ -8,10 +8,12 @@ import { PackageFlipCard } from '@/components/packages/PackageFlipCard';
 import { SectionBadge } from '@/components/ui/SectionBadge';
 import { Reveal } from '@/components/ui/Reveal';
 import { StatRow } from '@/components/ui/CountUp';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 type FilterTab = 'all' | 'himalayan' | 'bangladesh';
 
 export function PopularPackages({ packages, destinations }: { packages: CardPackage[]; destinations: number }) {
+  const { t, formatNumber } = useLanguage();
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   const himalayanSlugs = [
@@ -38,20 +40,40 @@ export function PopularPackages({ packages, destinations }: { packages: CardPack
       <div className="container relative">
         <Reveal className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
           <div className="max-w-2xl">
-            <SectionBadge>Famous &amp; Popular Destinations</SectionBadge>
+            <SectionBadge>
+              {t('popularPackages.badge', 'Famous & Popular Destinations')}
+            </SectionBadge>
             <h2 className="section-title mt-4">
-              Explore Our Most <span className="accent">Iconic &amp; Popular Places</span>
+              {t('popularPackages.title', 'Explore Our Most')}{' '}
+              <span className="accent">
+                {t('popularPackages.titleAccent', 'Iconic & Popular Places')}
+              </span>
             </h2>
             <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-slate-600">
-              High-altitude mountain expeditions, colonial heritage retreats, sea-of-clouds ridges, and pristine tropical islands with verified itineraries.
+              {t(
+                'popularPackages.description',
+                'High-altitude mountain expeditions, colonial heritage retreats, sea-of-clouds ridges, and pristine tropical islands with verified itineraries.'
+              )}
             </p>
           </div>
           <div className="w-full lg:w-auto">
             <StatRow
               stats={[
-                { value: packages.length, suffix: '+', label: 'Popular Packages' },
-                { value: destinations, suffix: '+', label: 'Destinations' },
-                { value: 100, suffix: '%', label: 'Satisfaction' },
+                {
+                  value: packages.length,
+                  suffix: '+',
+                  label: t('popularPackages.statPopular', 'Popular Packages'),
+                },
+                {
+                  value: destinations,
+                  suffix: '+',
+                  label: t('popularPackages.statDestinations', 'Destinations'),
+                },
+                {
+                  value: 100,
+                  suffix: '%',
+                  label: t('popularPackages.statSatisfaction', 'Satisfaction'),
+                },
               ]}
             />
           </div>
@@ -69,7 +91,9 @@ export function PopularPackages({ packages, destinations }: { packages: CardPack
             }`}
           >
             <Sparkles className="h-3.5 w-3.5" />
-            <span>All Famous Places ({packages.length})</span>
+            <span>
+              {t('popularPackages.tabAll', 'All Famous Places')} ({formatNumber(packages.length)})
+            </span>
           </button>
 
           <button
@@ -82,7 +106,9 @@ export function PopularPackages({ packages, destinations }: { packages: CardPack
             }`}
           >
             <Compass className="h-3.5 w-3.5 text-cyan-500" />
-            <span>Himalayan &amp; Snow Wonders (6)</span>
+            <span>
+              {t('popularPackages.tabHimalayan', 'Himalayan & Snow Wonders')} ({formatNumber(6)})
+            </span>
           </button>
 
           <button
@@ -94,7 +120,7 @@ export function PopularPackages({ packages, destinations }: { packages: CardPack
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <span>🌴 Bangladesh Top Wonders</span>
+            <span>🌴 {t('popularPackages.tabBangladesh', 'Bangladesh Top Wonders')}</span>
           </button>
         </div>
 

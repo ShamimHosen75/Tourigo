@@ -12,13 +12,14 @@ html {
 
 body {
   @apply bg-paper text-ink antialiased;
+  font-family: var(--font-body), 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Kohinoor Bangla', 'Kalpurush', 'Nirmala UI', system-ui, sans-serif;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  @apply font-display;
+  font-family: var(--font-display), 'Hind Siliguri', 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Kohinoor Bangla', 'Kalpurush', 'Nirmala UI', system-ui, sans-serif;
 }
 
 @layer components {

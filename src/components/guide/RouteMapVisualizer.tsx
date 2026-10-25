@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MapPin,
@@ -19,6 +19,7 @@ import {
   Footprints,
 } from 'lucide-react';
 import type { TourRouteGuide, RouteWaypoint, TransitVehicleMode } from '@/types/tourGuide';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 function getVehicleIcon(mode?: TransitVehicleMode) {
   switch (mode) {
@@ -42,8 +43,13 @@ function getVehicleIcon(mode?: TransitVehicleMode) {
 }
 
 export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
+  const { t, formatNumber, locale } = useLanguage();
   const [selectedWp, setSelectedWp] = useState<RouteWaypoint>(guide.waypoints[0] || null);
   const [viewMode, setViewMode] = useState<'interactive' | 'google-map'>('interactive');
+
+  useEffect(() => {
+    setSelectedWp(guide.waypoints[0] || null);
+  }, [guide]);
 
   const originWp = guide.waypoints[0];
   const destWp = guide.waypoints[guide.waypoints.length - 1];
@@ -61,13 +67,15 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-extrabold text-ink sm:text-lg">Route & Waypoints Visualizer</h3>
+              <h3 className="text-base font-extrabold text-ink sm:text-lg">
+                {t('tourGuideExplorer.routeVisualizerTitle', 'Route & Waypoints Visualizer')}
+              </h3>
               <span className="chip bg-brand-50 text-[10px] font-bold uppercase tracking-wider text-brand-600">
-                Interactive
+                {locale === 'bn' ? 'ইন্টারেক্টিভ' : 'Interactive'}
               </span>
             </div>
             <p className="text-xs text-ink-mute">
-              {guide.totalDistanceKm} km total corridor • {guide.totalDurationHours} travel time • {guide.waypoints.length} verified stops
+              {formatNumber(guide.totalDistanceKm)} {t('common.km', 'km')} • {guide.totalDurationHours} • {formatNumber(guide.waypoints.length)} {locale === 'bn' ? 'স্টপ' : 'verified stops'}
             </p>
           </div>
         </div>
@@ -84,7 +92,7 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
               }`}
             >
               <Layers className="h-3.5 w-3.5" />
-              <span>Route Flow</span>
+              <span>{t('tourGuideExplorer.routeFlow', 'Route Flow')}</span>
             </button>
             <button
               onClick={() => setViewMode('google-map')}
@@ -95,7 +103,7 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
               }`}
             >
               <Navigation className="h-3.5 w-3.5" />
-              <span>Satellite / Live Map</span>
+              <span>{t('tourGuideExplorer.liveMap', 'Satellite / Live Map')}</span>
             </button>
           </div>
 
@@ -107,7 +115,7 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
             title="Open in Google Maps for live driving / turn-by-turn GPS navigation"
           >
             <Navigation className="h-3.5 w-3.5" />
-            <span>Open in GPS</span>
+            <span>{t('tourGuideExplorer.openGps', 'Open in GPS')}</span>
             <ExternalLink className="h-3 w-3 opacity-60" />
           </a>
         </div>
@@ -133,19 +141,19 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
             <div className="relative z-10 mb-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" /> Origin Point
+                  <span className="h-3 w-3 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" /> {t('tourGuideExplorer.originPoint', 'Origin Point')}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-amber-400 ring-4 ring-amber-400/20" /> Convoy / Ghat
+                  <span className="h-3 w-3 rounded-full bg-amber-400 ring-4 ring-amber-400/20" /> {t('tourGuideExplorer.convoyPoint', 'Convoy / Ghat')}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-brand-400 ring-4 ring-brand-400/20" /> Transit Hub
+                  <span className="h-3 w-3 rounded-full bg-brand-400 ring-4 ring-brand-400/20" /> {t('tourGuideExplorer.transitPoint', 'Transit Hub')}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-rose-400 ring-4 ring-rose-400/20" /> Final Destination
+                  <span className="h-3 w-3 rounded-full bg-rose-400 ring-4 ring-rose-400/20" /> {t('tourGuideExplorer.destPoint', 'Final Destination')}
                 </span>
               </div>
-              <span className="text-[11px] text-cyan-300/80 italic">Click any stop icon to inspect details</span>
+              <span className="text-[11px] text-cyan-300/80 italic">{t('tourGuideExplorer.clickInspect', 'Click any stop icon to inspect details')}</span>
             </div>
 
             {/* Visual Waypoint Nodes Corridor */}
@@ -239,11 +247,11 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="chip bg-brand-500/20 text-cyan-300 border border-brand-400/30 text-[10px] font-bold uppercase tracking-wider">
-                          Stop Details
+                          {t('tourGuideExplorer.stopDetails', 'Stop Details')}
                         </span>
                         {selectedWp.stayTime && (
                           <span className="chip bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-semibold">
-                            <Clock className="h-3 w-3" /> Stop duration: {selectedWp.stayTime}
+                            <Clock className="h-3 w-3" /> {t('tourGuideExplorer.stopDuration', 'Stop duration: ')} {selectedWp.stayTime}
                           </span>
                         )}
                       </div>
@@ -255,7 +263,9 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
 
                     {selectedWp.transitToNext && (
                       <div className="rounded-xl border border-cyan-500/25 bg-cyan-950/40 p-3.5 text-right sm:min-w-[240px]">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Next Transit Leg</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                          {t('tourGuideExplorer.nextTransitLeg', 'Next Transit Leg')}
+                        </p>
                         <p className="mt-0.5 text-sm font-bold text-white">{selectedWp.transitToNext.vehicleName}</p>
                         <div className="mt-1.5 flex items-center justify-end gap-3 text-xs text-slate-300">
                           <span className="flex items-center gap-1">
@@ -296,23 +306,23 @@ export function RouteMapVisualizer({ guide }: { guide: TourRouteGuide }) {
       {/* Corridor Elevation & Terrain Profile Footer */}
       <div className="grid grid-cols-2 gap-4 border-t border-slate-100 bg-white p-4 text-xs sm:grid-cols-4 sm:px-6">
         <div>
-          <span className="text-ink-mute">Corridor Distance</span>
-          <p className="mt-0.5 text-sm font-extrabold text-ink">{guide.totalDistanceKm} Kilometers</p>
+          <span className="text-ink-mute">{t('tourGuideExplorer.corridorDistance', 'Corridor Distance')}</span>
+          <p className="mt-0.5 text-sm font-extrabold text-ink">{formatNumber(guide.totalDistanceKm)} {t('common.km', 'km')}</p>
         </div>
         <div>
-          <span className="text-ink-mute">Transit Duration</span>
+          <span className="text-ink-mute">{t('tourGuideExplorer.transitDuration', 'Transit Duration')}</span>
           <p className="mt-0.5 text-sm font-extrabold text-brand-600">{guide.totalDurationHours}</p>
         </div>
         <div>
-          <span className="text-ink-mute">Recommended Stay</span>
+          <span className="text-ink-mute">{t('tourGuideExplorer.recommendedStay', 'Recommended Stay')}</span>
           <p className="mt-0.5 text-sm font-extrabold text-ink">
-            {guide.recommendedDays} Days / {guide.recommendedDays - 1} Nights
+            {formatNumber(guide.recommendedDays)} {locale === 'bn' ? 'দিন' : 'Days'} / {formatNumber(guide.recommendedDays - 1)} {locale === 'bn' ? 'রাত' : 'Nights'}
           </p>
         </div>
         <div>
-          <span className="text-ink-mute">Terrain Profile</span>
+          <span className="text-ink-mute">{t('tourGuideExplorer.terrainProfile', 'Terrain Profile')}</span>
           <p className="mt-0.5 text-sm font-extrabold text-emerald-600 flex items-center gap-1">
-            <span>Highway</span> → <span>Hill / Ocean</span>
+            <span>{locale === 'bn' ? 'হাইওয়ে' : 'Highway'}</span> → <span>{locale === 'bn' ? 'পাহাড় / সাগর' : 'Hill / Ocean'}</span>
           </p>
         </div>
       </div>

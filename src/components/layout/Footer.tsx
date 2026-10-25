@@ -1,9 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import { ChevronRight, Mail, MapPin, Phone } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import { FacebookIcon, InstagramIcon, YoutubeIcon } from '@/components/ui/SocialIcons';
 import { Logo } from './Logo';
 import { HeroTrekker } from '@/components/home/HeroTrekker';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // Trekker height in px that appears above the footer border line.
 const TREKKER_H = 130;
@@ -35,14 +38,30 @@ function WalkingHiker() {
 }
 
 export function Footer({ featured }: { featured: { title: string; slug: string }[] }) {
+  const { t } = useLanguage();
+
   const quick = [
-    { label: 'Home', href: '/' },
-    { label: 'A-Z Tour Guide & Map', href: '/tour-guide' },
-    { label: 'About Us', href: '/about' },
-    { label: 'Packages', href: '/packages' },
-    { label: 'Blogs & Articles', href: '/blogs' },
-    { label: 'Contact Us', href: '/contact' },
+    { label: t('footer.links.home', 'Home'), href: '/' },
+    { label: t('footer.links.guide', 'A-Z Tour Guide & Map'), href: '/tour-guide' },
+    { label: t('footer.links.about', 'About Us'), href: '/about' },
+    { label: t('footer.links.packages', 'Packages'), href: '/packages' },
+    { label: t('footer.links.blogs', 'Blogs & Articles'), href: '/blogs' },
+    { label: t('footer.links.contact', 'Contact Us'), href: '/contact' },
   ];
+
+  const getLegalLabel = (href: string, fallback: string) => {
+    switch (href) {
+      case '/terms':
+        return t('footer.legal.terms', fallback);
+      case '/cancellation-policy':
+        return t('footer.legal.cancellation', fallback);
+      case '/privacy-policy':
+        return t('footer.legal.privacy', fallback);
+      default:
+        return fallback;
+    }
+  };
+
   return (
     <footer className="relative mt-24 border-t-2 border-brand-400 bg-gradient-to-b from-white to-amber-50/40">
       <WalkingHiker />
@@ -50,7 +69,7 @@ export function Footer({ featured }: { featured: { title: string; slug: string }
         <div>
           <Logo size="lg" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-mute">
-            Your ultimate companion for thrilling treks, guided holiday tours, camping getaways and unforgettable travel experiences across {siteConfig.country}.
+            {t('footer.description', `Your ultimate companion for thrilling treks, guided holiday tours, camping getaways and unforgettable travel experiences across ${siteConfig.country}.`)}
           </p>
           <div className="mt-5 flex gap-2">
             {[
@@ -64,17 +83,17 @@ export function Footer({ featured }: { featured: { title: string; slug: string }
             ))}
           </div>
         </div>
-        <FooterCol title="Quick Links">
+        <FooterCol title={t('footer.quickLinks', 'Quick Links')}>
           {quick.map((l) => (
             <FooterLink key={l.href} href={l.href}>{l.label}</FooterLink>
           ))}
         </FooterCol>
-        <FooterCol title="Featured Treks & Tours">
+        <FooterCol title={t('footer.featuredTours', 'Featured Treks & Tours')}>
           {featured.map((p) => (
             <FooterLink key={p.slug} href={`/packages/${p.slug}`}>{p.title}</FooterLink>
           ))}
         </FooterCol>
-        <FooterCol title="Contact Support">
+        <FooterCol title={t('footer.contactSupport', 'Contact Support')}>
           <li className="flex gap-2.5 text-sm text-ink-mute"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />{siteConfig.contact.address}</li>
           <li><a href={siteConfig.contact.phoneHref} className="flex gap-2.5 text-sm text-ink-mute hover:text-brand-500"><Phone className="h-4 w-4 text-brand-500" />{siteConfig.contact.phone}</a></li>
           <li><a href={`mailto:${siteConfig.contact.email}`} className="flex gap-2.5 text-sm text-ink-mute hover:text-brand-500"><Mail className="h-4 w-4 text-brand-500" />{siteConfig.contact.email}</a></li>
@@ -82,10 +101,10 @@ export function Footer({ featured }: { featured: { title: string; slug: string }
       </div>
       <div className="border-t border-slate-200/70">
         <div className="container flex flex-col items-center justify-between gap-3 py-5 text-xs text-ink-mute md:flex-row">
-          <p>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+          <p>{t('footer.copyright', `© ${new Date().getFullYear()} ${siteConfig.name}. All rights reserved.`, { year: new Date().getFullYear() })}</p>
           <div className="flex flex-wrap justify-center gap-5">
             {siteConfig.legal.map((l) => (
-              <Link key={l.href} href={l.href} className="hover:text-brand-500">{l.label}</Link>
+              <Link key={l.href} href={l.href} className="hover:text-brand-500">{getLegalLabel(l.href, l.label)}</Link>
             ))}
           </div>
         </div>

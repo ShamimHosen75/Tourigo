@@ -14,6 +14,7 @@
     "db:seed-sql": "tsx scripts/generate-seed-sql.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "2.117.3",
     "@types/three": "^0.186.0",
     "framer-motion": "11.18.2",
